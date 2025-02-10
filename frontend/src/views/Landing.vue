@@ -1,57 +1,140 @@
-<script setup></script>
+<script setup>
+import TopBar from '../components/TopBar.vue'
+import Footer from '../components/Footer.vue'
+</script>
 
 <template>
+    <TopBar />
     <div>
         <div id="leading-container">
-            <p>Go+Vue App</p>
-            <p>Based on <span><a href="https://vite.dev" target="_blank" id="vite-link">Vite</a></span>⚡ scaffolding</p>
-            <RouterLink to="/languages" id="nav-lang">Languages List</RouterLink>
+            <h1 class="shiny-title">ODONTOLOGÍA DIGITAL</h1>
+            <p>Implantes · Ortodoncia · Zirconio · Modelado 3D</p>
+            <div id="navigation-container">
+                <RouterLink to="/turnos" class="nav-option">Pedir turno</RouterLink>
+                <RouterLink to="/tratamientos" class="nav-option">Tratamientos</RouterLink>
+            </div>
         </div>
     </div>
+    <Footer />
 </template>
 <style scoped>
 #leading-container {
-    border: 16px dashed;
-    border-radius: 1em;
-    padding: 2em;
-    transition: 0.5s;
-    border-left-color: rgb(98, 159, 163);
-    border-top-color: rgb(98, 159, 163);
-    border-right-color: rgb(34, 114, 45);
-    border-bottom-color: rgb(34, 114, 45);
+    margin: 8px;
+}
+
+.shiny-title {
+    font-family: poppins-bold;
+    font-size: 4rem;
+}
+
+p {
+    font-size: 1.5rem;
+    color: #404042;
+}
+
+#navigation-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.nav-option {
+    text-decoration: none;
+    color: #EEEEEE;
+    padding: 0.8em;
+    font-size: 1.7rem;
+    border-radius: 0.8em;
+    background-color: #3790D0;
+    margin: 8px;
+    width: 250px;
+    transition: 0.25s;
+    will-change: transform;
 
     &:hover {
         transform: scale(1.05);
-        border-right-color: rgb(98, 159, 163);
-        border-bottom-color: rgb(98, 159, 163);
-        border-left-color: rgb(34, 114, 45);
-        border-top-color: rgb(34, 114, 45);
     }
 }
 
-#vite-link {
-    color: rgb(168, 111, 221);
+.shiny-title {
+    position: relative;
+    color: #ffffff;
+    background: linear-gradient(to right, #2d2d30 0%, white 20%, #121215 100%);
+    background-size: 200% auto;
+    background-position: -100% center;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     text-decoration: none;
-    transition: 0.3s;
+    white-space: nowrap;
+    animation: shine 3s infinite linear;
+}
 
-    &:hover {
-        text-shadow: rgb(198, 166, 228) 1px 0 15px;
-        ;
+@keyframes shine {
+    0% {
+        background-position: -100% center;
+    }
+
+    100% {
+        background-position: 100% center;
     }
 }
 
-#nav-lang {
-    display: block;
-    transition: 0.3s;
-    text-decoration: none;
-    color: rgba(255, 255, 255, 0.85);
-    padding: 0.8em;
-    border-radius: 1em;
-    background-color: rgb(39, 74, 139);
-
-    &:hover {
-        box-shadow: 0px 8px 8px 8px rgba(39, 74, 139, 0.226);
+@media (max-width: 800px) {
+    .shiny-title {
+        font-size: 3rem;
     }
 
+    p {
+        font-size: 1.2rem;
+    }
+
+    .nav-option {
+        padding: 0.8em;
+        width: 170px;
+        font-size: 20px;
+    }
+
+}
+
+@media (max-width: 650px) {
+    .shiny-title {
+        font-size: 2.2rem;
+    }
+
+    p {
+        font-size: 0.9rem;
+    }
+
+    .nav-option {
+        padding: 0.6em;
+        width: 160px;
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 500px) {
+    .shiny-title {
+        font-size: 1.6rem;
+    }
+
+    .nav-option {
+        padding: 0.6em;
+        width: 150px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 315px) {
+    .shiny-title {
+        font-size: 1.1rem;
+        text-wrap: wrap;
+    }
+
+    .nav-option {
+        padding: 0.5em;
+        width: 120px;
+        font-size: 16px;
+    }
 }
 </style>
