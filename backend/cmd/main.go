@@ -11,8 +11,6 @@ import (
 )
 
 func main() {
-	// UNCOMMENT .ENV FROM THE GITIGNORE FILE
-
 	if err := godotenv.Load("../backend/.env"); err != nil {
 		log.Printf("environment variables loading error: %v\n", err)
 	}
