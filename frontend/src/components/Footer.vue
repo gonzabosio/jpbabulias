@@ -70,6 +70,7 @@ footer {
     height: fit-content;
     padding-left: 30%;
     padding-right: 30%;
+    border-top: 1px solid rgb(150, 150, 150);
 }
 
 hr {

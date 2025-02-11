@@ -17,7 +17,6 @@
             </RouterLink>
         </div>
     </header>
-    <hr>
 </template>
 
 <style scoped>
@@ -29,6 +28,7 @@ header {
     align-items: center;
     padding: 1em;
     text-align: left;
+    border-bottom: 1px solid rgb(150, 150, 150);
 }
 
 #tooth {

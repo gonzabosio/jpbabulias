@@ -42,7 +42,7 @@ p {
 .nav-option {
     text-decoration: none;
     color: #EEEEEE;
-    padding: 0.8em;
+    padding: 0.7em;
     font-size: 1.7rem;
     border-radius: 0.8em;
     background-color: #3790D0;
@@ -50,9 +50,15 @@ p {
     width: 250px;
     transition: 0.25s;
     will-change: transform;
+    border: 4px solid #3790D0;
 
     &:hover {
         transform: scale(1.05);
+    }
+
+    &:last-child {
+        background-color: transparent;
+        color: #3790D0;
     }
 }
 
