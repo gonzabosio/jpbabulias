@@ -1,10 +1,8 @@
 <script setup>
-import TopBar from '../components/TopBar.vue'
 import Footer from '../components/Footer.vue'
 </script>
 
 <template>
-    <TopBar />
     <div>
         <div id="leading-container">
             <h1 class="shiny-title">ODONTOLOGÍA DIGITAL</h1>
