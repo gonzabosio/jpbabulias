@@ -20,7 +20,7 @@ func (p *PostgreService) SaveAppointment(appt *model.Appointment) error {
 	if err != nil {
 		return err
 	}
-	err = p.DB.QueryRow(`INSERT INTO appointment(appt_date, user_id) VALUES($1, $2) RETURNING id`, appt.ApptDate, userIdNum).Scan(&apptID)
+	err = p.DB.QueryRow(`INSERT INTO appointment(appt_date, subject, user_id) VALUES($1, $2) RETURNING id`, appt.ApptDate, appt.Subject, userIdNum).Scan(&apptID)
 	if err != nil {
 		return err
 	}
@@ -34,13 +34,13 @@ func (p *PostgreService) ReadAppointments(userIdStr string) ([]model.Appointment
 	if err != nil {
 		return nil, err
 	}
-	rows, err := p.DB.Query(`SELECT id, appt_date FROM appointment WHERE user_id=$1`, userId)
+	rows, err := p.DB.Query(`SELECT id, appt_date, subject FROM appointment WHERE user_id=$1`, userId)
 	if err != nil {
 		return nil, err
 	}
 	for rows.Next() {
 		var appt model.AppointmentList
-		if err := rows.Scan(&appt.ID, &appt.ApptDate); err != nil {
+		if err := rows.Scan(&appt.ID, &appt.ApptDate, &appt.Subject); err != nil {
 			return nil, err
 		}
 		appts = append(appts, appt)
