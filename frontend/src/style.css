@@ -15,6 +15,24 @@ body {
   text-align: center;
 }
 
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #EEEEEE;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #363636;
+  border-radius: 1em;
+
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #121215;
+}
+
 @font-face {
   font-family: 'poppins-regular';
   src: url('../src/fonts/Poppins-Regular.ttf');
