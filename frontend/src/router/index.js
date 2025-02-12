@@ -4,6 +4,7 @@ import Appointments from '../views/Appointments.vue'
 import NotFound from '../views/NotFound.vue'
 import Profile from '../views/Profile.vue'
 import Treatments from '../views/Treatments.vue'
+import ApptConfirmation from '../views/ApptConfirmation.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,7 +17,12 @@ const router = createRouter({
         {
             path: '/turnos',
             name: 'appointments',
-            component: Appointments
+            component: Appointments,
+        },
+        {
+            path: '/turnos/confirmar',
+            name: 'appointmentConfirmation',
+            component: ApptConfirmation
         },
         {
             path: '/perfil',

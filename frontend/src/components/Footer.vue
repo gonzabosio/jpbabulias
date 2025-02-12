@@ -1,6 +1,6 @@
 <template>
     <footer>
-        <div id="contact">
+        <div id="contact" class="column">
             <span>Contacto</span>
             <a id="instagram" href="https://www.instagram.com/od.jpbabulias" target="_blank">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
@@ -25,7 +25,7 @@
                 <span class="det">Whatsapp</span>
             </a>
         </div>
-        <div id="location">
+        <div id="location" class="column">
             <span>Ubicación</span>
             <div class="location-details">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
@@ -59,18 +59,20 @@
 
 <style scoped>
 footer {
-    background-color: #D9DEE9;
-    position: fixed;
     display: flex;
+    background-color: #D9DEE9;
     bottom: 0px;
     left: 0px;
     right: 0px;
-    margin-bottom: 0px;
-    padding-bottom: 2rem;
     height: fit-content;
     padding-left: 30%;
     padding-right: 30%;
     border-top: 1px solid rgb(150, 150, 150);
+}
+
+.column {
+    margin-top: 2em;
+    margin-bottom: 2em;
 }
 
 hr {
@@ -90,7 +92,6 @@ span {
 #contact {
     display: flex;
     flex-direction: column;
-    margin-top: 2rem;
     gap: 10px;
     text-align: left;
     flex-grow: 1;
@@ -113,7 +114,6 @@ span {
     display: flex;
     flex-direction: column;
     align-items: start;
-    margin-top: 2rem;
     gap: 10px;
     text-align: right;
 
@@ -152,6 +152,11 @@ span {
 @media (max-width: 450px) {
     footer {
         flex-direction: column;
+    }
+
+    .column {
+        margin-top: 1em;
+        margin-bottom: 1em;
     }
 }
 

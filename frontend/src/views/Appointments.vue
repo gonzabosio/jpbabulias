@@ -70,6 +70,9 @@ const normalizeDate = (date) => {
     d.setHours(0, 0, 0, 0);
     return d.getTime();
 }
+
+const hoursList = ['07:00', '08:00']
+const hourSelected = ref('')
 </script>
 
 <template>
@@ -86,22 +89,31 @@ const normalizeDate = (date) => {
                 <span id="orange" class="circle"></span>Consultorio cerrado
             </div>
         </div>
-        <!-- <div id="appt-calendar-container"> -->
         <VDatePicker id="appt-calendar" v-model.string="selectedDate" transparent :is-dark="false" locale="es"
             :disabled-dates="disabledDates" expanded :rows="2" :first-day-of-week="0" :min-date="minDate"
             :attributes="attrs" @dayclick="onDayClick" />
-        <!-- </div> -->
-        <p v-if="normalizeDate(selectedDate) >= normalizeDate(minDate)">
-            {{
-                selectedDate.getUTCDate() + '/' + (selectedDate.getUTCMonth() + 1) + '/' + selectedDate.getUTCFullYear()
-            }}
-        </p>
+        <div v-if="normalizeDate(selectedDate) >= normalizeDate(minDate)" id="schedule">
+            <p>
+                {{
+                    selectedDate.getUTCDate() + '/' + (selectedDate.getUTCMonth() + 1) + '/' + selectedDate.getUTCFullYear()
+                }}
+            </p>
+            <div id="appt-list">
+                <div class="appt-card" v-for="(hour, index) in hoursList" :key="index" @click="hourSelected = hour">
+                    <input type="radio" class="btn-radio" :id="'appt-' + index" name="appointment" :value="hour"
+                        v-model="hourSelected">
+                    <label :for="'appt-' + index">{{ hour }}</label>
+                </div>
+                <RouterLink to="/turnos/confirmar" id="btn-schedule">Agendar
+                </RouterLink>
+            </div>
+        </div>
     </div>
 </template>
 
 <style scoped>
 #container {
-    padding: 24px;
+    margin-top: 12px;
 }
 
 .reference {
@@ -128,6 +140,50 @@ const normalizeDate = (date) => {
 
 #gray {
     background-color: #cbd5e1;
+}
+
+#appt-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.appt-card {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    border: 2px solid rgb(175, 175, 175);
+    border-radius: 0.5em;
+    padding: 4px 8px;
+    margin: 4px 4px;
+
+    input[type=radio] {
+        cursor: pointer;
+        width: 28px;
+        height: 28px;
+    }
+
+    label {
+        cursor: pointer;
+    }
+}
+
+#btn-schedule {
+    cursor: pointer;
+    color: #EEEEEE;
+    background-color: #3790D0;
+    border: 4px solid #3790D0;
+    transition: 0.25s;
+    font-size: 1rem;
+    margin: 1.5em 0;
+    font-weight: 600;
+    width: 100px;
+    height: 50px;
+    border-radius: 0.5em;
+
+    &:hover {
+        border: 4px solid #2176b3;
+    }
 }
 
 @media (max-width: 300px) {

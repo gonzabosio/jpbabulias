@@ -1,5 +1,11 @@
 <script setup>
 import Footer from '../components/Footer.vue'
+
+const descriptionList = [
+    'Más de XX años de experiencia como profesional',
+    'Especializado en cierta práctica',
+    'Recibido en la Universidad de Córdoba'
+]
 </script>
 
 <template>
@@ -11,13 +17,25 @@ import Footer from '../components/Footer.vue'
                 <RouterLink to="/turnos" class="nav-option">Pedir turno</RouterLink>
                 <RouterLink to="/tratamientos" class="nav-option">Tratamientos</RouterLink>
             </div>
+            <section id="about">
+                <article id="dentist-pic">
+                    <img src="../assets/dentist_pic_dec.png" alt="dentista">
+                </article>
+                <article id="description">
+                    <ul>
+                        <li class="description-items" v-for="item in descriptionList">{{ item }}</li>
+                    </ul>
+                </article>
+            </section>
         </div>
     </div>
-    <Footer />
 </template>
 <style scoped>
 #leading-container {
     margin: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .shiny-title {
@@ -35,6 +53,7 @@ p {
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    margin: 4em 0 4em 0;
 }
 
 .nav-option {
@@ -84,6 +103,47 @@ p {
     }
 }
 
+#about {
+    display: flex;
+    align-items: center;
+    padding: 1.8em;
+    margin-top: 6em;
+    margin-bottom: 6em;
+    border-left: 4px solid #3790D0;
+    border-right: 4px solid #3790D0;
+    mask-image: linear-gradient(to bottom, transparent 0%, white 10%, white 90%, transparent 100%);
+
+    #description {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 32px;
+    }
+
+    .description-items {
+        text-align: left;
+        font-size: 1.5rem;
+        padding: 16px 16px;
+        border-radius: 8px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .description-items:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 10px #3790d07a;
+    }
+
+    #dentist-pic {
+        display: flex;
+        margin-right: 16px;
+
+        img {
+            width: 250px;
+        }
+    }
+}
+
+
 @media (max-width: 800px) {
     .shiny-title {
         font-size: 3rem;
@@ -97,6 +157,12 @@ p {
         padding: 0.8em;
         width: 170px;
         font-size: 20px;
+    }
+
+    #about {
+        .description-items {
+            font-size: 1.2rem;
+        }
     }
 
 }
@@ -115,6 +181,20 @@ p {
         width: 160px;
         font-size: 20px;
     }
+
+    #about {
+        flex-direction: column;
+
+        .description-items {
+            font-size: 1rem;
+        }
+
+        #dentist-pic img {
+            width: 250px;
+        }
+    }
+
+
 }
 
 @media (max-width: 500px) {
@@ -129,7 +209,7 @@ p {
     }
 }
 
-@media (max-width: 315px) {
+@media (max-width: 350px) {
     .shiny-title {
         font-size: 1.1rem;
         text-wrap: wrap;
@@ -139,6 +219,16 @@ p {
         padding: 0.5em;
         width: 120px;
         font-size: 16px;
+    }
+
+    #about {
+        .description-items {
+            font-size: 0.8rem;
+        }
+
+        #dentist-pic img {
+            width: 150px;
+        }
     }
 }
 </style>

@@ -21,24 +21,28 @@
 
 <style scoped>
 header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
     background-color: #d9dee9;
     color: #121215;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1em;
     text-align: left;
     border-bottom: 1px solid rgb(150, 150, 150);
+    z-index: 100;
 }
 
 #tooth {
     width: 50px;
+    margin: 8px 16px 8px 16px;
 }
 
 #doctor-name {
     font-size: 2.5rem;
     font-weight: bold;
-    margin-left: 16px;
     flex-grow: 1;
 }
 
@@ -52,9 +56,16 @@ header {
     border-radius: 50%;
     border: 2px solid #121215;
     padding: 0.3em;
+    margin: 8px 16px 8px 8px;
     transition: box-shadow 0.2s ease-in-out;
     transition: 0.2s;
     text-decoration: none;
+    color: #121215;
+    /* width: 50px;
+    height: 50px;
+    text-align: center;
+    align-items: center;
+    justify-content: center; */
 
     &:hover {
         box-shadow: 0 0 0 2px #121215;
@@ -77,14 +88,12 @@ hr {
         width: 30px;
     }
 
-    #nav-profile {
-        padding: 0;
-    }
-}
-
-@media (max-width: 315px) {
     #doctor-name {
         font-size: 20px;
+    }
+
+    #nav-profile {
+        padding: 0;
     }
 }
 </style>
