@@ -1,10 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 import { useToast } from "vue-toastification";
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const toast = useToast()
 const selectedDate = ref(new Date())
-const f = new Intl.DateTimeFormat('es-ar')
 
 const disabledDates = ref([
     {
@@ -38,9 +39,10 @@ const maxDate = new Date()
 maxDate.setMonth(maxDate.getMonth() + 4)
 
 const onDayClick = (day) => {
+    hourSelected.value = ''
     // console.log('Day ID: ', day.id)
     const clickedDate = new Date(day.date)
-    console.log('Clicked date:', clickedDate.toUTCString())
+    console.log('Clicked date:', clickedDate)
     selectedDate.value = clickedDate
 
     if (day.isDisabled) {
@@ -71,8 +73,16 @@ const normalizeDate = (date) => {
     return d.getTime();
 }
 
-const hoursList = ['07:00', '08:00']
+const hoursList = ['07:00', '07:30', '08:00']
 const hourSelected = ref('')
+
+const doSomething = (selDate) => {
+    let formattedDate = new Date(selDate)
+    const [hour, minute] = hourSelected.value.split(':')
+    formattedDate.setHours(hour, minute)
+    sessionStorage.setItem('selectedDate', formattedDate)
+    router.push('/turnos/confirmar')
+}
 </script>
 
 <template>
@@ -98,14 +108,15 @@ const hourSelected = ref('')
                     selectedDate.getUTCDate() + '/' + (selectedDate.getUTCMonth() + 1) + '/' + selectedDate.getUTCFullYear()
                 }}
             </p>
+            <p>Seleccione una hora</p>
             <div id="appt-list">
                 <div class="appt-card" v-for="(hour, index) in hoursList" :key="index" @click="hourSelected = hour">
                     <input type="radio" class="btn-radio" :id="'appt-' + index" name="appointment" :value="hour"
                         v-model="hourSelected">
                     <label :for="'appt-' + index">{{ hour }}</label>
                 </div>
-                <RouterLink to="/turnos/confirmar" id="btn-schedule">Agendar
-                </RouterLink>
+                <button id="btn-schedule" @click="doSomething(selectedDate)"
+                    :disabled="hourSelected === ''">Agendar</button>
             </div>
         </div>
     </div>
@@ -155,7 +166,7 @@ const hourSelected = ref('')
     border: 2px solid rgb(175, 175, 175);
     border-radius: 0.5em;
     padding: 4px 8px;
-    margin: 4px 4px;
+    margin: 4px 0px;
 
     input[type=radio] {
         cursor: pointer;
@@ -180,11 +191,30 @@ const hourSelected = ref('')
     width: 100px;
     height: 50px;
     border-radius: 0.5em;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:disabled {
+        background-color: gray;
+        border: 4px solid gray;
+
+        &:hover {
+            border: 4px solid gray;
+        }
+    }
 
     &:hover {
         border: 4px solid #2176b3;
     }
 }
+
+.disabled-link {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
 
 @media (max-width: 300px) {
     #container {
