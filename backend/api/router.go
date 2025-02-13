@@ -35,6 +35,7 @@ func newRouter() (*chi.Mux, error) {
 	r.Route("/appointment", func(r chi.Router) {
 		r.Post("/", h.AddAppointmentHandler)
 		r.Get("/{user_id}", h.GetAppointmentsByUserIdHandler)
+		r.Get("/day", h.GetAppointmentsByDayHandler)
 		r.Delete("/{appt_id}", h.DeleteAppointmentHandler)
 	})
 	return r, nil

@@ -49,21 +49,29 @@ const onDayClick = (day) => {
         console.log('Date is unavailable ❌')
         return
     }
+    let isDateInArray = false
+    let isWithinRange = false
     attrs.value.forEach(attr => {
         if (Array.isArray(attr.dates)) {
             // if clicked day is in the array of dates
-            const isDateInArray = attr.dates.some(date => date.toISOString().split('T')[0] === day.date.toISOString().split('T')[0]);
+            isDateInArray = attr.dates.some(date => date.toISOString().split('T')[0] === day.date.toISOString().split('T')[0])
             if (isDateInArray) {
                 console.log('Date is fully occupied 🔒')
+                return
             }
         } else if (typeof attr.dates === 'object' && attr.dates.start && attr.dates.end) {
             // if clicked day is within the date range
-            const isWithinRange = clickedDate >= attr.dates.start && clickedDate <= attr.dates.end;
+            isWithinRange = clickedDate >= attr.dates.start && clickedDate <= attr.dates.end
             if (isWithinRange) {
                 console.log('Closed for holidays 🌴')
+                return
             }
         }
-    });
+    })
+    if (!isDateInArray && !isWithinRange) {
+        console.log('send request for the day: ', selectedDate.value.toISOString())
+        // const formattedDate = selectedDate.value.toISOString().slice(0, 19).replace("T", " ")
+    }
 }
 
 const normalizeDate = (date) => {

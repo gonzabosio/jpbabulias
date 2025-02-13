@@ -52,10 +52,34 @@ func (h *Handler) GetAppointmentsByUserIdHandler(w http.ResponseWriter, r *http.
 		}, http.StatusBadRequest)
 		return
 	}
-	appts, err := h.rp.ReadAppointments(userId)
+	appts, err := h.rp.ReadAppointmentsByUserId(userId)
 	if err != nil {
 		writeJSON(w, map[string]string{
-			"message":    fmt.Sprintf("Failed to read appointments"),
+			"message":    fmt.Sprintf("Failed to read appointments by user id"),
+			"error_dets": err.Error(),
+		}, http.StatusInternalServerError)
+		return
+	}
+	writeJSON(w, map[string]interface{}{
+		"message":      "Appointments retrieved",
+		"appointments": appts,
+	}, http.StatusOK)
+}
+
+func (h *Handler) GetAppointmentsByDayHandler(w http.ResponseWriter, r *http.Request) {
+	day := r.URL.Query().Get("date")
+	if day == "" {
+		writeJSON(w, map[string]string{
+			"message":    "Failed to get date",
+			"error_dets": "empty query field",
+		}, http.StatusBadRequest)
+		return
+	}
+
+	appts, err := h.rp.ReadAppointmentsByDay(day)
+	if err != nil {
+		writeJSON(w, map[string]string{
+			"message":    fmt.Sprintf("Failed to read appointments by day"),
 			"error_dets": err.Error(),
 		}, http.StatusInternalServerError)
 		return
