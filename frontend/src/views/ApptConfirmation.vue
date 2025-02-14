@@ -1,5 +1,43 @@
 <script setup>
-import { reactive, computed, ref } from 'vue'
+import { reactive, computed, ref, onMounted, onBeforeMount, watch } from 'vue'
+import { getPatientsDataByUserId } from '../fetch/patient'
+import { useToast } from "vue-toastification";
+
+const toast = useToast()
+
+const localStoredUserDate = JSON.parse(localStorage.getItem("user") || "{}")
+
+const patients = ref([])
+const patientSelected = ref({})
+const patientSelectedId = ref('')
+
+onBeforeMount(async () => {
+    setTimeout(async () => {
+        if (!patients.value.length) {
+            // show loading spinner component while getting patient data
+            const response = await getPatientsDataByUserId(localStoredUserDate.user_id)
+            if (response.error) {
+                console.error(response.message)
+            } else {
+                patients.value = response.patients
+                const defaultPatient = patients.value.find(opt => opt.main)
+                if (defaultPatient) {
+                    patientSelected.value = defaultPatient
+                    patientSelectedId.value = patientSelected.value.id
+                } else {
+                    toast.error('Error al intentar cargar datos del paciente')
+                }
+                console.log('Selected:', patientSelected.value)
+            }
+        }
+
+    }, 500)
+})
+
+watch(patientSelectedId, async (newId) => {
+    console.log('search data of:', newId)
+    // load data from new patient selected
+})
 
 const f = new Intl.DateTimeFormat('es-ar', {
     dateStyle: "full",
@@ -10,18 +48,28 @@ const selectedDate = new Date(sessionStorage.getItem('selectedDate'))
 const dateToConfirm = f.format(selectedDate)
 
 const formData = reactive({
-    fullName: '',
-    email: '',
-    phone: '',
-    dni: '',
-    hin: ''
-    // agreement: false
+    subject: "",
+    fullName: "",
+    email: localStoredUserDate.email,
+    phone: "",
+    dni: "",
+    hin: ""
+})
+
+watch(patientSelected, (loadedPatient) => {
+    if (loadedPatient) {
+        formData.fullName = loadedPatient.first_name + ' ' + loadedPatient.last_name
+        formData.phone = loadedPatient.phone_number
+        formData.dni = loadedPatient.dni
+        formData.hin = loadedPatient.health_insurance
+    }
 })
 
 const isSubmitted = ref(false)
 
 const isFormValid = computed(() => {
     return (
+        formData.subject &&
         formData.fullName &&
         formData.email &&
         formData.phone &&
@@ -38,21 +86,29 @@ const submitForm = () => {
     }
 }
 
-
 </script>
 
 <template>
     <div class="form-container">
         <h2>Confirma tu turno</h2>
         <p>{{ String(dateToConfirm).charAt(0).toUpperCase() + String(dateToConfirm).slice(1) }}</p>
+        <select v-if="patientSelectedId" name="patient" id="patient-selection" v-model="patientSelectedId">
+            <option v-for="patient in patients" :key="patient.id" :value="String(patient.id)">
+                {{ patient.first_name + ' ' + patient.last_name }}
+            </option>
+        </select>
         <form @submit.prevent="submitForm">
             <div class="form-group">
+                <label for="subject">Asunto (max. 50 caracteres)</label>
+                <input type="text" id="subject" v-model="formData.subject" required maxlength="50" />
+            </div>
+            <div class="form-group">
                 <label for="fullName">Nombre completo</label>
-                <input type="text" id="fullName" v-model="formData.fullName" required />
+                <input type="text" id="fullName" v-model="formData.fullName" disabled />
             </div>
             <div class="form-group">
                 <label for="email">Correo</label>
-                <input type="email" id="email" v-model="formData.email" required />
+                <input type="email" id="email" :value="formData.email" disabled />
             </div>
             <div class="form-group">
                 <label for="phone">Número de teléfono</label>
@@ -60,11 +116,11 @@ const submitForm = () => {
             </div>
             <div class="form-group">
                 <label for="dni">DNI</label>
-                <input type="number" id="dni" v-model="formData.dni" required />
+                <input type="number" id="dni" v-model="formData.dni" disabled />
             </div>
             <div class="form-group">
                 <label for="hin">Obra social</label>
-                <input type="text" id="hin" v-model="formData.hin" required />
+                <input type="text" id="hin" v-model="formData.hin" disabled />
             </div>
             <button type="submit" :disabled="!isFormValid">Confirmar</button>
         </form>
@@ -77,7 +133,7 @@ const submitForm = () => {
 <style scoped>
 .form-container {
     max-width: 500px;
-    margin: 9em auto;
+    margin: 5em auto;
     padding: 30px;
     background-color: #f5f5f5;
     border-radius: 8px;
@@ -92,41 +148,66 @@ h2 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 1em;
+
+    &:first-child {
+        margin-top: 2em;
+    }
 }
 
 label {
-    display: block;
-    margin-bottom: 5px;
+    display: flex;
+    width: 85%;
+    margin-left: 1em;
+    margin-bottom: 0.5em;
     color: #666;
 }
 
-/* input[type="date"] */
+#patient-selection {
+    width: 50%;
+    height: 30px;
+    font-size: 16px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 0;
+}
 
 input[type="text"],
 input[type="email"],
 input[type="tel"],
 input[type="number"] {
-    width: 100%;
+    width: 80%;
     padding: 8px;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 0.3em;
     font-size: 16px;
 }
 
 button {
-    width: 100%;
-    padding: 10px;
+    width: 90%;
+    padding: 12px;
+    margin-top: 2em;
     background-color: #3790D0;
     font-weight: 600;
     color: white;
     border: none;
-    border-radius: 4px;
-    font-size: 16px;
+    border-radius: 0.5em;
+    font-size: 1.2rem;
     cursor: pointer;
+    transition: 0.25s;
+
+    border: 4px solid transparent;
+
+    &:disabled {
+        background-color: gray;
+
+        &:hover {
+            border: 4px solid gray;
+        }
+    }
 
     &:hover {
-        background-color: #2176b3;
+        border: 4px solid #2176b3;
     }
 }
 

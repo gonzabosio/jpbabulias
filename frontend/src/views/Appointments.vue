@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeMount, onMounted, ref } from 'vue'
 import { useToast } from "vue-toastification";
 import { useRouter } from 'vue-router'
 import ThreeDotsMove from '../components/ThreeDotsMove.vue';
@@ -8,10 +8,10 @@ import { getDayAppointments, getFullyBookedDates } from '../fetch/appt';
 const router = useRouter()
 const toast = useToast()
 const fullDates = ref([])
-onMounted(async () => {
-    const result = await getFullyBookedDates()
+onBeforeMount(async () => {
+    // const result = await getFullyBookedDates()
     // console.log(result.fully_booked_dates)
-    fullDates.value = result.fully_booked_dates.map(date => new Date(date))
+    // fullDates.value = result.fully_booked_dates.map(date => new Date(date))
 })
 
 const selectedDate = ref(new Date())
@@ -57,7 +57,7 @@ const onDayClick = async (day) => {
     hourSelected.value = ''
     // console.log('Day ID: ', day.id)
     const clickedDate = new Date(day.date)
-    console.log('Clicked date:', clickedDate)
+    // console.log('Clicked date:', clickedDate)
     selectedDate.value = clickedDate
 
     if (day.isDisabled) {
