@@ -9,8 +9,9 @@ import (
 
 type AppointmentRepository interface {
 	SaveAppointment(appt *model.Appointment) error
-	ReadAppointmentsByUserId(userIdStr string) ([]model.AppointmentList, error)
-	ReadAppointmentsByDay(day string) ([]model.AppointmentList, error)
+	ReadAppointmentsByUserId(userIdStr string) (*[]model.AppointmentList, error)
+	ReadAppointmentsByDay(day string) (*[]string, error)
+	ReadFullyBookedDates() (*[]string, error)
 	DeleteAppointment(userIdStrr string) error
 }
 
@@ -30,8 +31,8 @@ func (p *PostgreService) SaveAppointment(appt *model.Appointment) error {
 	return nil
 }
 
-func (p *PostgreService) ReadAppointmentsByUserId(userIdStr string) ([]model.AppointmentList, error) {
-	var appts []model.AppointmentList
+func (p *PostgreService) ReadAppointmentsByUserId(userIdStr string) (*[]model.AppointmentList, error) {
+	appts := []model.AppointmentList{}
 	userId, err := strconv.ParseInt(userIdStr, 10, 64)
 	if err != nil {
 		return nil, err
@@ -47,27 +48,58 @@ func (p *PostgreService) ReadAppointmentsByUserId(userIdStr string) ([]model.App
 		}
 		appts = append(appts, appt)
 	}
-	return appts, nil
+	return &appts, nil
 }
 
-func (p *PostgreService) ReadAppointmentsByDay(day string) ([]model.AppointmentList, error) {
+func (p *PostgreService) ReadAppointmentsByDay(day string) (*[]string, error) {
 	parsedDate, err := time.Parse(time.RFC3339, day)
 	if err != nil {
 		return nil, err
 	}
 	start := parsedDate.Format("2006-01-02 15:04:05")
 	end := parsedDate.Add(24 * time.Hour).Format("2006-01-02 15:04:05")
-	rows, err := p.DB.Query(`SELECT id, appt_date, subject FROM appointment WHERE appt_date >= $1 and appt_date <= $2`, start, end)
+	rows, err := p.DB.Query(`SELECT appt_date FROM appointment WHERE appt_date >= $1 and appt_date <= $2`, start, end)
 	if err != nil {
 		return nil, err
 	}
-	var apptList []model.AppointmentList
+	var apptList []time.Time
 	for rows.Next() {
-		var appt model.AppointmentList
-		rows.Scan(&appt.ID, &appt.ApptDate, &appt.Subject)
+		var appt time.Time
+		rows.Scan(&appt)
 		apptList = append(apptList, appt)
 	}
-	return apptList, nil
+	var hoursList []string
+	for _, it := range apptList {
+		hm := it.Format("15:04")
+		hoursList = append(hoursList, hm)
+	}
+	return &hoursList, nil
+}
+
+func (p *PostgreService) ReadFullyBookedDates() (*[]string, error) {
+	rows, err := p.DB.Query(
+		`WITH fully_booked_dates AS (
+		SELECT 
+			DATE(appt_date) AS date,  --extract date
+			COUNT(*) AS booked_slots
+		FROM appointment
+		WHERE appt_date BETWEEN CURRENT_DATE 
+			AND (CURRENT_DATE + INTERVAL '4 months')
+		GROUP BY DATE(appt_date)
+		HAVING COUNT(*) = 16  --max slots
+		)
+		SELECT date FROM fully_booked_dates;`,
+	)
+	if err != nil {
+		return nil, err
+	}
+	fullyBookedDates := []string{}
+	for rows.Next() {
+		var date string
+		rows.Scan(&date)
+		fullyBookedDates = append(fullyBookedDates, date)
+	}
+	return &fullyBookedDates, nil
 }
 
 func (p *PostgreService) DeleteAppointment(userIdStr string) error {

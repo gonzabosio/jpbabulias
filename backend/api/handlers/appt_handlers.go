@@ -60,9 +60,10 @@ func (h *Handler) GetAppointmentsByUserIdHandler(w http.ResponseWriter, r *http.
 		}, http.StatusInternalServerError)
 		return
 	}
+
 	writeJSON(w, map[string]interface{}{
 		"message":      "Appointments retrieved",
-		"appointments": appts,
+		"appointments": &appts,
 	}, http.StatusOK)
 }
 
@@ -84,9 +85,31 @@ func (h *Handler) GetAppointmentsByDayHandler(w http.ResponseWriter, r *http.Req
 		}, http.StatusInternalServerError)
 		return
 	}
+	if len(*appts) == 0 {
+		writeJSON(w, map[string]interface{}{
+			"message":      "Appointments retrieved",
+			"appointments": []string{},
+		}, http.StatusOK)
+		return
+	}
 	writeJSON(w, map[string]interface{}{
 		"message":      "Appointments retrieved",
-		"appointments": appts,
+		"appointments": &appts,
+	}, http.StatusOK)
+}
+
+func (h *Handler) GetFullyBookedDatesHandler(w http.ResponseWriter, r *http.Request) {
+	dateList, err := h.rp.ReadFullyBookedDates()
+	if err != nil {
+		writeJSON(w, map[string]string{
+			"message":    "Failed to get the fully booked dates",
+			"error_dets": err.Error(),
+		}, http.StatusInternalServerError)
+		return
+	}
+	writeJSON(w, map[string]interface{}{
+		"message":            "Fully booked dates retrieved",
+		"fully_booked_dates": &dateList,
 	}, http.StatusOK)
 }
 

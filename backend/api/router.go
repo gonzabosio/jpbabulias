@@ -36,6 +36,7 @@ func newRouter() (*chi.Mux, error) {
 		r.Post("/", h.AddAppointmentHandler)
 		r.Get("/{user_id}", h.GetAppointmentsByUserIdHandler)
 		r.Get("/day", h.GetAppointmentsByDayHandler)
+		r.Get("/full", h.GetFullyBookedDatesHandler)
 		r.Delete("/{appt_id}", h.DeleteAppointmentHandler)
 	})
 	return r, nil
