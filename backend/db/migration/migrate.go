@@ -33,7 +33,7 @@ func main() {
 	}
 	basePath := "./db/migration/query"
 
-	querieFiles := []string{"/create_table_user.sql", "/create_table_appt.sql"}
+	querieFiles := []string{"/create_table_patient.sql", "/create_table_appt.sql"}
 
 	var wg sync.WaitGroup
 	for _, f := range querieFiles {

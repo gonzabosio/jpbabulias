@@ -4,6 +4,7 @@ import "database/sql"
 
 type Service interface {
 	AppointmentRepository
+	PatientRepository
 }
 
 type PostgreService struct {

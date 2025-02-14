@@ -11,8 +11,6 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-var validate = validator.New(validator.WithRequiredStructEnabled())
-
 func (h *Handler) AddAppointmentHandler(w http.ResponseWriter, r *http.Request) {
 	reqbody := new(model.Appointment)
 	if err := json.NewDecoder(r.Body).Decode(&reqbody); err != nil {
@@ -80,7 +78,7 @@ func (h *Handler) GetAppointmentsByDayHandler(w http.ResponseWriter, r *http.Req
 	appts, err := h.rp.ReadAppointmentsByDay(day)
 	if err != nil {
 		writeJSON(w, map[string]string{
-			"message":    fmt.Sprintf("Failed to read appointments by day"),
+			"message":    "Failed to read appointments by day",
 			"error_dets": err.Error(),
 		}, http.StatusInternalServerError)
 		return

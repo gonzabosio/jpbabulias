@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql"
 	"strconv"
 	"time"
 
@@ -12,18 +13,18 @@ type AppointmentRepository interface {
 	ReadAppointmentsByUserId(userIdStr string) (*[]model.AppointmentList, error)
 	ReadAppointmentsByDay(day string) (*[]string, error)
 	ReadFullyBookedDates() (*[]string, error)
-	DeleteAppointment(userIdStrr string) error
+	DeleteAppointment(apptId string) error
 }
 
-var _ AppointmentRepository = (*PostgreService)(nil)
+// var _ AppointmentRepository = (*PostgreService)(nil)
 
 func (p *PostgreService) SaveAppointment(appt *model.Appointment) error {
 	var apptID int
-	userIdNum, err := strconv.ParseInt(appt.UserID, 10, 64)
+	patientIdNum, err := strconv.ParseInt(appt.PatientID, 10, 64)
 	if err != nil {
 		return err
 	}
-	err = p.DB.QueryRow(`INSERT INTO appointment(appt_date, subject, user_id) VALUES($1, $2, $3) RETURNING id`, appt.ApptDate, appt.Subject, userIdNum).Scan(&apptID)
+	err = p.DB.QueryRow(`INSERT INTO appointment(appt_date, subject, patient_id) VALUES($1, $2, $3) RETURNING id`, appt.ApptDate, appt.Subject, patientIdNum).Scan(&apptID)
 	if err != nil {
 		return err
 	}
@@ -37,13 +38,13 @@ func (p *PostgreService) ReadAppointmentsByUserId(userIdStr string) (*[]model.Ap
 	if err != nil {
 		return nil, err
 	}
-	rows, err := p.DB.Query(`SELECT id, appt_date, subject FROM appointment WHERE user_id=$1`, userId)
+	rows, err := p.DB.Query(`SELECT a.id, a.appt_date, a.subject, p.* FROM appointment AS a JOIN patient AS p ON p.id=a.patient_id WHERE user_id=$1`, userId)
 	if err != nil {
 		return nil, err
 	}
 	for rows.Next() {
 		var appt model.AppointmentList
-		if err := rows.Scan(&appt.ID, &appt.ApptDate, &appt.Subject); err != nil {
+		if err := rows.Scan(&appt.ID, &appt.ApptDate, &appt.Subject, &appt.PatientID, &appt.FirstName, &appt.LastName, &appt.PhoneNumber, &appt.Dni, &appt.HealthInsurance, &appt.Main, &appt.UserID); err != nil {
 			return nil, err
 		}
 		appts = append(appts, appt)
@@ -63,12 +64,18 @@ func (p *PostgreService) ReadAppointmentsByDay(day string) (*[]string, error) {
 		return nil, err
 	}
 	var apptList []time.Time
+	hoursList := []string{}
 	for rows.Next() {
 		var appt time.Time
-		rows.Scan(&appt)
+		if err := rows.Scan(&appt); err != nil {
+			if err == sql.ErrNoRows {
+				return &hoursList, nil
+			} else {
+				return nil, err
+			}
+		}
 		apptList = append(apptList, appt)
 	}
-	var hoursList []string
 	for _, it := range apptList {
 		hm := it.Format("15:04")
 		hoursList = append(hoursList, hm)
@@ -96,18 +103,24 @@ func (p *PostgreService) ReadFullyBookedDates() (*[]string, error) {
 	fullyBookedDates := []string{}
 	for rows.Next() {
 		var date string
-		rows.Scan(&date)
+		if err := rows.Scan(&date); err != nil {
+			if err == sql.ErrNoRows {
+				return &fullyBookedDates, nil
+			} else {
+				return nil, err
+			}
+		}
 		fullyBookedDates = append(fullyBookedDates, date)
 	}
 	return &fullyBookedDates, nil
 }
 
-func (p *PostgreService) DeleteAppointment(userIdStr string) error {
-	userId, err := strconv.ParseInt(userIdStr, 10, 64)
+func (p *PostgreService) DeleteAppointment(apptIdStr string) error {
+	apptId, err := strconv.ParseInt(apptIdStr, 10, 64)
 	if err != nil {
 		return err
 	}
-	_, err = p.DB.Exec(`DELETE FROM appointment WHERE id=$1`, userId)
+	_, err = p.DB.Exec(`DELETE FROM appointment WHERE id=$1`, apptId)
 	if err != nil {
 		return err
 	}

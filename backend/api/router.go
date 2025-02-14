@@ -39,5 +39,9 @@ func newRouter() (*chi.Mux, error) {
 		r.Get("/full", h.GetFullyBookedDatesHandler)
 		r.Delete("/{appt_id}", h.DeleteAppointmentHandler)
 	})
+
+	r.Route("/patient", func(r chi.Router) {
+		r.Get("/{user_id}", h.GetPatientsByUserIdHandler)
+	})
 	return r, nil
 }
