@@ -190,7 +190,8 @@ const goConfirm = (selDate) => {
 
 <style scoped>
 #container {
-    margin-top: 12px;
+    margin: 0 1em;
+    margin-bottom: 4em;
 }
 
 .reference {

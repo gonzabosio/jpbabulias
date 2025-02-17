@@ -2,7 +2,9 @@
 
 <template>
     <header>
-        <img src="../assets/tooth_icon_title.svg" alt="diente" id="tooth">
+        <a href="/">
+            <img src="../assets/tooth_icon_title.svg" alt="diente" id="tooth">
+        </a>
         <div id="doctor-name">
             Dr. Juan Pablo Babulias
         </div>
@@ -28,11 +30,27 @@ header {
     background-color: #d9dee9;
     color: #121215;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     text-align: left;
     border-bottom: 1px solid rgb(150, 150, 150);
     z-index: 100;
+}
+
+a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+        transition: 0.2s;
+    }
+
+    &:hover {
+        img {
+            filter: drop-shadow(4px 4px 6px rgba(0, 0, 0, 0.5));
+        }
+    }
 }
 
 #tooth {

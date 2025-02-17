@@ -1,8 +1,8 @@
 <script setup>
-import Footer from '../components/Footer.vue'
+import Chatbot from '../components/Chatbot.vue'
 
 const descriptionList = [
-    'Más de XX años de experiencia como profesional',
+    'Más de X años de experiencia como profesional',
     'Especializado en cierta práctica',
     'Recibido en la Universidad de Córdoba'
 ]
@@ -28,6 +28,7 @@ const descriptionList = [
                 </article>
             </section>
         </div>
+        <Chatbot />
     </div>
 </template>
 <style scoped>
@@ -36,6 +37,7 @@ const descriptionList = [
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
 }
 
 .shiny-title {
@@ -149,14 +151,10 @@ p {
         font-size: 3rem;
     }
 
-    p {
-        font-size: 1.2rem;
-    }
-
     .nav-option {
-        padding: 0.8em;
-        width: 170px;
-        font-size: 20px;
+        padding: 0.9em;
+        width: 200px;
+        font-size: 1.5rem;
     }
 
     #about {
@@ -169,61 +167,54 @@ p {
 
 @media (max-width: 650px) {
     .shiny-title {
-        font-size: 2.2rem;
+        font-size: 2.5rem;
     }
 
     p {
-        font-size: 0.9rem;
+        font-size: 18px;
     }
 
     .nav-option {
-        padding: 0.6em;
-        width: 160px;
-        font-size: 20px;
+        width: 170px;
     }
 
     #about {
         flex-direction: column;
 
         .description-items {
-            font-size: 1rem;
+            font-size: 16px;
         }
 
         #dentist-pic img {
             width: 250px;
         }
     }
-
-
 }
 
 @media (max-width: 500px) {
     .shiny-title {
-        font-size: 1.6rem;
+        font-size: 1.8rem;
     }
 
     .nav-option {
-        padding: 0.6em;
         width: 150px;
-        font-size: 1rem;
+        font-size: 20px;
     }
 }
 
 @media (max-width: 350px) {
     .shiny-title {
-        font-size: 1.1rem;
+        font-size: 1.8rem;
         text-wrap: wrap;
     }
 
     .nav-option {
-        padding: 0.5em;
-        width: 120px;
-        font-size: 16px;
+        font-size: 18px;
     }
 
     #about {
         .description-items {
-            font-size: 0.8rem;
+            font-size: 16px;
         }
 
         #dentist-pic img {

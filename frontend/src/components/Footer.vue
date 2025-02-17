@@ -60,14 +60,14 @@
 <style scoped>
 footer {
     display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: #D9DEE9;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-    height: fit-content;
+    border-top: 1px solid rgb(150, 150, 150);
     padding-left: 30%;
     padding-right: 30%;
-    border-top: 1px solid rgb(150, 150, 150);
+    text-align: center;
+    /* height: fit-content; */
 }
 
 .column {
@@ -152,6 +152,7 @@ span {
 @media (max-width: 450px) {
     footer {
         flex-direction: column;
+        align-items: start;
     }
 
     .column {

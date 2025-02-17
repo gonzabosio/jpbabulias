@@ -11,9 +11,24 @@ const isNotFound = computed(() => route.name === 'not-found');
 </script>
 
 <template>
-  <TopBar v-if="!isNotFound" />
-  <RouterView />
-  <Footer v-if="!isNotFound" />
+  <div class="app-container">
+    <TopBar v-if="!isNotFound" />
+    <main class="main-content">
+      <RouterView />
+    </main>
+    <Footer v-if="!isNotFound" />
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+}
+</style>
