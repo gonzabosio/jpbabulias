@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
+import { sendPrompt } from '../fetch/bot'
 
 const isChatOpen = ref(false)
 const messages = ref([])
@@ -7,18 +8,47 @@ const userInput = ref('')
 
 const toggleChat = () => {
     isChatOpen.value = !isChatOpen.value
+    if (isChatOpen.value) {
+        nextTick(() => {
+            scrollToBottom()
+        })
+    }
 }
+
+const chatContainer = ref(null)
+const isProcessing = ref(false)
+const scrollToBottom = () => {
+    if (chatContainer.value) {
+        chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
+    }
+};
 
 const sendMessage = () => {
     if (userInput.value.trim() === '') return
 
     messages.value.push({ text: userInput.value, sender: 'user' })
+    nextTick(() => {
+        scrollToBottom()
+    })
+    const prompt = userInput.value
     userInput.value = ''
 
-    // replace with actual chatbot logic
-    setTimeout(() => {
-        messages.value.push({ text: 'Ok', sender: 'bot' })
-    }, 1000)
+    isProcessing.value = true
+    setTimeout(async () => {
+        const result = await sendPrompt(prompt)
+        if (result.error) {
+            console.error(result)
+            messages.value.push({ text: 'Ocurrió un error. Intente de nuevo.', sender: 'bot' })
+            isProcessing.value = false
+        } else {
+            // console.log(result)
+            messages.value.push({ text: result.response, sender: 'bot' })
+            isProcessing.value = false
+            nextTick(() => {
+                scrollToBottom()
+            })
+        }
+    }, 500)
 }
 
 onMounted(() => {
@@ -38,14 +68,18 @@ onMounted(() => {
             <div class="chat-header">
                 <h3>Chatbot</h3>
             </div>
-            <div class="chat-messages">
+            <div class="chat-messages" ref="chatContainer">
                 <div v-for="(message, index) in messages" :key="index" :class="['message', message.sender]">
-                    {{ message.text }}
+                    <span v-html="message.text"></span>
                 </div>
             </div>
+            <div v-if="isProcessing" class="processing-msg">
+                <div class="globe"></div>
+            </div>
             <div class="chat-input">
-                <input v-model="userInput" @keyup.enter="sendMessage" placeholder="¿Qué horarios tiene el doctor?" />
-                <button @click="sendMessage">Send</button>
+                <input v-model="userInput" @keyup.enter="sendMessage" placeholder="¿Qué horarios tiene el doctor?"
+                    :disabled="isProcessing" />
+                <button @click="sendMessage" :disabled="isProcessing">Enviar</button>
             </div>
         </div>
     </div>
@@ -129,8 +163,9 @@ onMounted(() => {
 .message {
     margin-bottom: 10px;
     padding: 8px 12px;
-    border-radius: 20px;
+    border-radius: 1em;
     max-width: 80%;
+    text-align: start;
 }
 
 .message.user {
@@ -155,12 +190,14 @@ onMounted(() => {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 3px;
+    font-family: poppins-regular;
 }
 
 .chat-input button {
     margin-left: 5px;
     padding: 5px 10px;
     background-color: #3790D0;
+    font-family: poppins-regular;
     font-weight: 600;
     color: white;
     border: none;
@@ -171,5 +208,31 @@ onMounted(() => {
 
 .chat-input button:hover {
     background-color: #2176b3;
+}
+
+.processing-msg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+}
+
+.globe {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #3790D0;
+    border-top: 2px solid transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 </style>

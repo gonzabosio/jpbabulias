@@ -2,6 +2,7 @@
 import { RouterView } from 'vue-router';
 import TopBar from '../src/components/TopBar.vue'
 import Footer from '../src/components/Footer.vue'
+import Chatbot from '../src/Components/Chatbot.vue'
 
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
@@ -15,6 +16,7 @@ const isNotFound = computed(() => route.name === 'not-found');
     <TopBar v-if="!isNotFound" />
     <main class="main-content">
       <RouterView />
+      <Chatbot />
     </main>
     <Footer v-if="!isNotFound" />
   </div>

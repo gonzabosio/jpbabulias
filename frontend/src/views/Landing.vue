@@ -9,26 +9,23 @@ const descriptionList = [
 </script>
 
 <template>
-    <div>
-        <div id="leading-container">
-            <h1 class="shiny-title">ODONTOLOGÍA DIGITAL</h1>
-            <p>Implantes · Ortodoncia · Zirconio · Modelado 3D</p>
-            <div id="navigation-container">
-                <RouterLink to="/turnos" class="nav-option">Pedir turno</RouterLink>
-                <RouterLink to="/tratamientos" class="nav-option">Tratamientos</RouterLink>
-            </div>
-            <section id="about">
-                <article id="dentist-pic">
-                    <img src="../assets/dentist_pic_dec.png" alt="dentista">
-                </article>
-                <article id="description">
-                    <ul>
-                        <li class="description-items" v-for="item in descriptionList">{{ item }}</li>
-                    </ul>
-                </article>
-            </section>
+    <div id="leading-container">
+        <h1 class="shiny-title">ODONTOLOGÍA DIGITAL</h1>
+        <p>Implantes · Ortodoncia · Zirconio · Modelado 3D</p>
+        <div id="navigation-container">
+            <RouterLink to="/turnos" class="nav-option">Pedir turno</RouterLink>
+            <RouterLink to="/tratamientos" class="nav-option">Tratamientos</RouterLink>
         </div>
-        <Chatbot />
+        <section id="about">
+            <article id="dentist-pic">
+                <img src="../assets/dentist_pic_dec.png" alt="dentista">
+            </article>
+            <article id="description">
+                <ul>
+                    <li class="description-items" v-for="item in descriptionList">{{ item }}</li>
+                </ul>
+            </article>
+        </section>
     </div>
 </template>
 <style scoped>

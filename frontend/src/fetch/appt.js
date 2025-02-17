@@ -1,4 +1,4 @@
-const backurl = import.meta.env.VITE_BACKEND_URL
+import { backurl } from "../main"
 
 export const getDayAppointments = async (date) => {
     try {

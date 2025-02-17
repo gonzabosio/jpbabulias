@@ -162,7 +162,7 @@ const goConfirm = (selDate) => {
         </div>
         <VDatePicker id="appt-calendar" v-model.string="selectedDate" transparent :is-dark="false" locale="es"
             :disabled-dates="disabledDates" expanded :rows="2" :first-day-of-week="0" :min-date="minDate"
-            :attributes="attrs" @dayclick="onDayClick" />
+            :max-date="maxDate" :attributes="attrs" @dayclick="onDayClick" />
         <div v-if="normalizeDate(selectedDate) >= normalizeDate(minDate)" id="schedule">
             <p>
                 {{

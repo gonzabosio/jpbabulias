@@ -6,6 +6,7 @@ import (
 	"os"
 
 	backend "github.com/gonzabosio/jpbabulias/api"
+	"github.com/gonzabosio/jpbabulias/bot"
 
 	"github.com/joho/godotenv"
 )
@@ -13,6 +14,9 @@ import (
 func main() {
 	if err := godotenv.Load("../backend/.env"); err != nil {
 		log.Printf("environment variables loading error: %v\n", err)
+	}
+	if err := bot.NewLLM(); err != nil {
+		log.Fatal(err.Error())
 	}
 	r, err := backend.SetupBackendServer()
 	if err != nil {

@@ -12,3 +12,5 @@ createApp(App)
     .use(VCalendar)
     .use(Toast)
     .mount('#app')
+
+export const backurl = import.meta.env.VITE_BACKEND_URL 
