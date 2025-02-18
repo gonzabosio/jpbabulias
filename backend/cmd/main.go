@@ -18,7 +18,7 @@ func main() {
 	if err := bot.NewLLM(); err != nil {
 		log.Fatal(err.Error())
 	}
-	r, err := backend.SetupBackendServer()
+	r, err := backend.NewRouter()
 	if err != nil {
 		log.Fatalf("Unable to setup backend server: %v", err)
 	}

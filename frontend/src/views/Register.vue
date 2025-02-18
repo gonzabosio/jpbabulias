@@ -1,13 +1,16 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { userLogin, userSignUp } from '../fetch/user'
+import { useToast } from "vue-toastification";
 
+const toast = useToast()
 const route = useRoute()
 const router = useRouter()
 const formMode = ref(route.query.mode)
 const formData = {
-    name: '',
-    surname: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     birthDate: '',
@@ -20,12 +23,36 @@ watch(formMode, () => {
     router.replace({ query: { mode: formMode.value } })
 })
 
-const handleLogin = () => {
-    // http request
+const handleLogin = async () => {
+    const resp = await userLogin(formData.email, formData.password)
+    if (resp.error) {
+        toast.error(resp.message)
+    } else {
+        const userData = {
+            user_id: resp.user_data.id,
+            email: resp.user_data.email,
+            admin: resp.user_data.admin
+        }
+        localStorage.setItem('user', JSON.stringify(userData))
+        router.replace('/')
+    }
 }
 
-const handleSignUp = () => {
-    // http request
+const handleSignUp = async () => {
+    const date = new Date(formData.birthDate)
+    formData.birthDate = date.toISOString()
+    const resp = await userSignUp(formData)
+    if (resp.error) {
+        toast.error('Falló el registro. Revise los campos e inténtelo de nuevo')
+    } else {
+        const userData = {
+            user_id: resp.user_data.id,
+            email: resp.user_data.email,
+            admin: resp.user_data.admin
+        }
+        localStorage.setItem('user', JSON.stringify(userData))
+        router.replace('/')
+    }
 }
 
 </script>
@@ -57,11 +84,11 @@ const handleSignUp = () => {
             <form @submit.prevent="handleSignUp">
                 <div class="form-group" v-if="!isLogin">
                     <label for="name">Nombre</label>
-                    <input type="text" id="name" v-model="formData.name" required>
+                    <input type="text" id="name" v-model="formData.firstName" required>
                 </div>
                 <div class="form-group" v-if="!isLogin">
                     <label for="surname">Apellido</label>
-                    <input type="text" id="surname" v-model="formData.surname" required>
+                    <input type="text" id="surname" v-model="formData.lastName" required>
                 </div>
                 <div class="form-group">
                     <label for="email">Correo electrónico</label>
@@ -79,7 +106,8 @@ const handleSignUp = () => {
                     <label for="phone-number">Número de teléfono</label>
                     <div class="phone-input-container">
                         <span class="phone-prefix">+54</span>
-                        <input type="tel" id="phone-number" v-model="formData.phoneNumber" required>
+                        <input type="tel" id="phone-number" v-model="formData.phoneNumber" placeholder="1234-101010"
+                            required>
                     </div>
                 </div>
                 <div class="form-group">

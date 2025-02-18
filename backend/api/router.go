@@ -13,7 +13,7 @@ import (
 	"github.com/go-chi/httprate"
 )
 
-func newRouter() (*chi.Mux, error) {
+func NewRouter() (*chi.Mux, error) {
 	h, err := handlers.NewHandler()
 	if err != nil {
 		return nil, err
@@ -30,6 +30,11 @@ func newRouter() (*chi.Mux, error) {
 
 	r.Head("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
+	})
+
+	r.Route("/user", func(r chi.Router) {
+		r.Post("/signup", h.UserSignUpHandler)
+		r.Post("/login", h.UserLoginHandler)
 	})
 
 	r.Route("/appointment", func(r chi.Router) {
