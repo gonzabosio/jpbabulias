@@ -24,7 +24,7 @@ func (h *Handler) SendPromptHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	req := promptReqBody{}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeJSON(w, map[string]string{
+		WriteJSON(w, map[string]string{
 			"message":    "Failed to read prompt request body",
 			"error_dets": err.Error(),
 		}, http.StatusBadRequest)
@@ -37,14 +37,14 @@ func (h *Handler) SendPromptHandler(w http.ResponseWriter, r *http.Request) {
 		"question":        req.Prompt,
 	}, chains.WithTemperature(0.5))
 	if err != nil {
-		writeJSON(w, map[string]string{
+		WriteJSON(w, map[string]string{
 			"message":    "Failed to generate bot response",
 			"error_dets": err.Error(),
 		}, http.StatusInternalServerError)
 		return
 	}
 	refAnswer := strings.ReplaceAll(answer["text"].(string), "\n", "<br>")
-	writeJSON(w, map[string]string{
+	WriteJSON(w, map[string]string{
 		"response": refAnswer,
 	}, http.StatusOK)
 }

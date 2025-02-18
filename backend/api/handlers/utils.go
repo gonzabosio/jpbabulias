@@ -10,7 +10,7 @@ import (
 
 var validate = validator.New(validator.WithRequiredStructEnabled())
 
-func writeJSON(w http.ResponseWriter, payload interface{}, statusCode int) {
+func WriteJSON(w http.ResponseWriter, payload interface{}, statusCode int) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	json.NewEncoder(w).Encode(payload)
