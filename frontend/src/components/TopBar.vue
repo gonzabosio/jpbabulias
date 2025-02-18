@@ -1,4 +1,6 @@
-<script setup></script>
+<script setup>
+const isLoggedIn = true
+</script>
 
 <template>
     <header>
@@ -8,7 +10,15 @@
         <div id="doctor-name">
             Dr. Juan Pablo Babulias
         </div>
-        <div class="header-right">
+        <div v-if="isLoggedIn" id="register-container">
+            <RouterLink :to="{ path: '/registro', query: { mode: 'login' } }" id="nav-login" class="underline-anim">
+                Iniciar Sesión
+            </RouterLink>
+            <RouterLink :to="{ path: '/registro', query: { mode: 'signup' } }" id="nav-signup" class="underline-anim">
+                Registrarse
+            </RouterLink>
+        </div>
+        <div v-else class="header-right">
             <RouterLink to="/perfil" id="nav-profile">
                 <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24"
                     style="fill: rgba(18, 18, 21, 1)">
@@ -91,6 +101,46 @@ a {
     }
 }
 
+#register-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 1em;
+}
+
+.underline-anim {
+    display: inline-block;
+    position: relative;
+    text-decoration: none;
+    color: #121215;
+    font-size: 18px;
+}
+
+.underline-anim::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #121215;
+    transition: transform 0.25s ease-out;
+}
+
+.underline-anim:hover::after {
+    transform: scaleX(1);
+}
+
+.underline-anim::after {
+    transform-origin: bottom center;
+}
+
+.underline-anim:hover::after {
+    transform-origin: bottom center;
+}
+
 hr {
     margin: 0;
 }
@@ -112,6 +162,14 @@ hr {
 
     #nav-profile {
         padding: 0;
+    }
+
+    #register-container {
+        flex-direction: column;
+    }
+
+    .underline-anim {
+        font-size: 16px;
     }
 }
 </style>

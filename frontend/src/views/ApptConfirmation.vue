@@ -138,6 +138,7 @@ const submitForm = () => {
     background-color: #f5f5f5;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding-top: 6em;
 }
 
 h2 {

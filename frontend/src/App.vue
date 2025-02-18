@@ -8,17 +8,17 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-const isNotFound = computed(() => route.name === 'not-found');
+const dontShow = computed(() => route.name === 'not-found' || route.name === 'register');
 </script>
 
 <template>
   <div class="app-container">
-    <TopBar v-if="!isNotFound" />
+    <TopBar v-if="!dontShow" />
     <main class="main-content">
       <RouterView />
-      <Chatbot />
+      <Chatbot v-if="!dontShow" />
     </main>
-    <Footer v-if="!isNotFound" />
+    <Footer v-if="!dontShow" />
   </div>
 </template>
 

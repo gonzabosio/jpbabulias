@@ -1,9 +1,13 @@
 <script setup></script>
 
 <template>
-    <div>
+    <div id="container">
         <h1>Perfil</h1>
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+#container {
+    padding-top: 6em;
+}
+</style>

@@ -1,7 +1,13 @@
 <script setup></script>
 
 <template>
-    <h1>Tratamientos</h1>
+    <div id="container">
+        <h1>Tratamientos</h1>
+    </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+#container {
+    padding: 7em 1em;
+}
+</style>

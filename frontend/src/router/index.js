@@ -5,6 +5,7 @@ import NotFound from '../views/NotFound.vue'
 import Profile from '../views/Profile.vue'
 import Treatments from '../views/Treatments.vue'
 import ApptConfirmation from '../views/ApptConfirmation.vue'
+import Register from '../views/Register.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,6 +34,11 @@ const router = createRouter({
             path: '/tratamientos',
             name: 'treatments',
             component: Treatments
+        },
+        {
+            path: '/registro',
+            name: 'register',
+            component: Register
         },
         {
             path: '/:pathMatch(.*)*',
