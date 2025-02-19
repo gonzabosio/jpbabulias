@@ -20,3 +20,14 @@ func hashPassword(password string) (hashedPassword string, err error) {
 	bHash, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	return string(bHash), nil
 }
+
+func SetCookie(w http.ResponseWriter, name, value string, maxAge int) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     name,
+		Value:    value,
+		HttpOnly: true,
+		MaxAge:   maxAge,
+		Path:     "/",
+		SameSite: http.SameSiteStrictMode,
+	})
+}

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/gonzabosio/jpbabulias/api/token"
 	"github.com/gonzabosio/jpbabulias/db/model"
 )
 
@@ -41,6 +42,27 @@ func (h *Handler) UserSignUpHandler(w http.ResponseWriter, r *http.Request) {
 		Email: reqBody.Email,
 		Admin: reqBody.Admin,
 	}
+
+	// credentials
+	accTkn, err := token.GenerateAccessToken(userData.ID)
+	if err != nil {
+		WriteJSON(w, map[string]string{
+			"message":    "Failed to generate access token",
+			"error_dets": err.Error(),
+		}, http.StatusInternalServerError)
+		return
+	}
+	rfTkn, err := token.GenerateRefreshToken(userData.ID)
+	if err != nil {
+		WriteJSON(w, map[string]string{
+			"message":    "Failed to generate refresh token",
+			"error_dets": err.Error(),
+		}, http.StatusInternalServerError)
+		return
+	}
+	SetCookie(w, "access_token", accTkn, token.ATMaxAgeStd)
+	SetCookie(w, "refresh_token", rfTkn, token.RTMaxAgeStd)
+
 	WriteJSON(w, map[string]interface{}{
 		"message":   "User registered",
 		"user_data": userData,
@@ -86,8 +108,37 @@ func (h *Handler) UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	// credentials
+	accTkn, err := token.GenerateAccessToken(userData.ID)
+	if err != nil {
+		WriteJSON(w, map[string]string{
+			"message":    "Failed to generate access token",
+			"error_dets": err.Error(),
+		}, http.StatusInternalServerError)
+		return
+	}
+	rfTkn, err := token.GenerateRefreshToken(userData.ID)
+	if err != nil {
+		WriteJSON(w, map[string]string{
+			"message":    "Failed to generate refresh token",
+			"error_dets": err.Error(),
+		}, http.StatusInternalServerError)
+		return
+	}
+	SetCookie(w, "access_token", accTkn, token.ATMaxAgeStd)
+	SetCookie(w, "refresh_token", rfTkn, token.RTMaxAgeStd)
+
 	WriteJSON(w, map[string]interface{}{
 		"message":   "User logged in",
 		"user_data": userData,
+	}, http.StatusOK)
+}
+
+func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	SetCookie(w, "access_token", "", -1)
+	SetCookie(w, "refresh_token", "", -1)
+	WriteJSON(w, map[string]string{
+		"message": "User logged out",
 	}, http.StatusOK)
 }

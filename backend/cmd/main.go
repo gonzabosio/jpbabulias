@@ -6,6 +6,7 @@ import (
 	"os"
 
 	backend "github.com/gonzabosio/jpbabulias/api"
+	"github.com/gonzabosio/jpbabulias/api/token"
 	"github.com/gonzabosio/jpbabulias/bot"
 
 	"github.com/joho/godotenv"
@@ -15,6 +16,7 @@ func main() {
 	if err := godotenv.Load("../backend/.env"); err != nil {
 		log.Printf("environment variables loading error: %v\n", err)
 	}
+	token.NewTokenAuth()
 	if err := bot.NewLLM(); err != nil {
 		log.Fatal(err.Error())
 	}
