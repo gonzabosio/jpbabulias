@@ -1,12 +1,20 @@
 <script setup>
-import { onBeforeMount, ref } from 'vue';
+import { onBeforeMount, onMounted, ref, watch } from 'vue';
 import { checkCookie } from '../router';
 const isLoggedIn = ref(false)
+const userData = ref(null)
 onBeforeMount(() => {
     const tokenExist = checkCookie('refresh_token')
     if (tokenExist) {
         isLoggedIn.value = true
     }
+})
+onMounted(() => {
+    userData.value = JSON.parse(localStorage.getItem('user'))
+})
+const profileLett = ref('')
+watch(userData, () => {
+    profileLett.value = String(userData.value.email).at(0).toLocaleUpperCase()
 })
 </script>
 
@@ -26,14 +34,15 @@ onBeforeMount(() => {
                 Registrarse
             </RouterLink>
         </div>
-        <div v-else class="header-right">
+        <div v-else class="header-right" v-if="userData">
             <RouterLink to="/perfil" id="nav-profile">
-                <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24"
+                <!-- <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24"
                     style="fill: rgba(18, 18, 21, 1)">
                     <path
                         d="M12 2a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3 3 0 0 1-3 3zm9 11v-1a7 7 0 0 0-7-7h-4a7 7 0 0 0-7 7v1h2v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1z">
                     </path>
-                </svg>
+                </svg> -->
+                <span id="letter">{{ profileLett }}</span>
             </RouterLink>
         </div>
     </header>
@@ -89,23 +98,26 @@ a {
 #nav-profile {
     display: flex;
     cursor: pointer;
-    border-radius: 50%;
+    border-radius: 100%;
     border: 2px solid #121215;
-    padding: 0.3em;
     margin: 8px 16px 8px 8px;
     transition: box-shadow 0.2s ease-in-out;
     transition: 0.2s;
     text-decoration: none;
     color: #121215;
-    /* width: 50px;
+    width: 50px;
     height: 50px;
     text-align: center;
     align-items: center;
-    justify-content: center; */
+    justify-content: center;
 
     &:hover {
         box-shadow: 0 0 0 2px #121215;
         background-color: #EEEEEE;
+    }
+
+    span {
+        font-size: 2rem;
     }
 }
 

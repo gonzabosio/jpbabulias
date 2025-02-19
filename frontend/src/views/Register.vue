@@ -109,7 +109,7 @@ const handleSignUp = async () => {
                     <label for="phone-number">Número de teléfono</label>
                     <div class="phone-input-container">
                         <span class="phone-prefix">+54</span>
-                        <input type="tel" id="phone-number" v-model="formData.phoneNumber" placeholder="1234-101010"
+                        <input type="tel" id="phone-number" v-model="formData.phoneNumber" placeholder="1234101010"
                             required>
                     </div>
                 </div>

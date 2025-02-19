@@ -89,6 +89,8 @@ const isFormValid = computed(() => {
 
 const submitForm = () => {
     if (isFormValid.value) {
+        let cleanedPhoneNumber = formData.phone.replace(/[^\d]/g, '');
+        formData.phone = cleanedPhoneNumber
         console.log('Form submitted:', formData)
         isSubmitted.value = true
         // send the data to a server
@@ -121,7 +123,7 @@ const submitForm = () => {
             </div>
             <div class="form-group">
                 <label for="phone">Número de teléfono</label>
-                <input type="tel" id="phone" v-model="formData.phone" required />
+                <input type="tel" id="phone" v-model="formData.phone" placeholder="3564101010" required />
             </div>
             <div class="form-group">
                 <label for="dni">DNI</label>

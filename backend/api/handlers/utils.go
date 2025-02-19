@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
@@ -35,6 +36,7 @@ func SetCookie(w http.ResponseWriter, name, value string, maxAge int) {
 		MaxAge:   maxAge,
 		Path:     "/",
 		Domain:   domain,
+		Expires:  time.Now().Add(time.Duration(maxAge) * time.Second),
 		SameSite: func() http.SameSite {
 			if isLocal {
 				return http.SameSiteLaxMode

@@ -7,6 +7,6 @@ type Patient struct {
 	PhoneNumber     string `json:"phone_number" validate:"required"`
 	Dni             int    `json:"dni" validate:"required"`
 	HealthInsurance string `json:"health_insurance" validate:"required"`
-	Main            bool   `json:"main" validate:"required"`
+	Main            bool   `json:"main"`
 	UserID          string `json:"user_id" validate:"required"`
 }

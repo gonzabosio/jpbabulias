@@ -13,13 +13,13 @@ func NewTokenAuth() {
 	TokenAuth = jwtauth.New("HS256", []byte(os.Getenv("JWT_SECRET")), nil)
 }
 
-var ATMaxAgeStd = int(5 * time.Minute)
-var RTMaxAgeStd = int(10 * time.Minute)
+var ATMaxAgeStd = int(15 * time.Minute / time.Second)
+var RTMaxAgeStd = int(30 * time.Minute / time.Second)
 
 func GenerateAccessToken(userID string) (accessToken string, err error) {
 	accessClaims := map[string]interface{}{
 		"user_id": userID,
-		"exp":     time.Now().Add(time.Duration(ATMaxAgeStd)).Unix(),
+		"exp":     time.Now().Add(time.Duration(ATMaxAgeStd) * time.Second),
 	}
 	_, accessToken, err = TokenAuth.Encode(accessClaims)
 	if err != nil {
@@ -31,7 +31,7 @@ func GenerateAccessToken(userID string) (accessToken string, err error) {
 func GenerateRefreshToken(userID string) (refreshToken string, err error) {
 	refreshClaims := map[string]interface{}{
 		"user_id": userID,
-		"exp":     time.Now().Add(time.Duration(RTMaxAgeStd)).Unix(),
+		"exp":     time.Now().Add(time.Duration(RTMaxAgeStd) * time.Second),
 	}
 	_, refreshToken, err = TokenAuth.Encode(refreshClaims)
 	if err != nil {

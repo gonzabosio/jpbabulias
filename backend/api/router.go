@@ -52,6 +52,7 @@ func NewRouter() (*chi.Mux, error) {
 
 		r.Route("/patient", func(r chi.Router) {
 			r.Get("/{user_id}", h.GetPatientsByUserIdHandler)
+			r.Post("/", h.AddPatientHandler)
 		})
 	})
 
