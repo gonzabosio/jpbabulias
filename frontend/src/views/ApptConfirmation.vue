@@ -17,7 +17,16 @@ onBeforeMount(async () => {
             // show loading spinner component while getting patient data
             const response = await getPatientsDataByUserId(localStoredUserDate.user_id)
             if (response.error) {
+                if (result.code === 401) {
+                    toast.info(result.message)
+                    router.replace({
+                        path: '/registro',
+                        query: { mode: 'login' }
+                    })
+                    return
+                }
                 console.error(response.message)
+                toast.error('Error al intentar cargar datos del paciente')
             } else {
                 patients.value = response.patients
                 const defaultPatient = patients.value.find(opt => opt.main)

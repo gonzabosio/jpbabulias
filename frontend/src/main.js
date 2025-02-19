@@ -13,4 +13,5 @@ createApp(App)
     .use(Toast)
     .mount('#app')
 
-export const backurl = import.meta.env.VITE_BACKEND_URL 
+export const backurl = import.meta.env.VITE_BACKEND_URL
+export const domain = import.meta.env.DOMAIN

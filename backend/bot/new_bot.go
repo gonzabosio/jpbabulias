@@ -32,7 +32,7 @@ func NewLLM() error {
 			PageContent: `
 			To check the schedule and make an appointment, go to "Pedir Turno" section of the website. If someone asks you to schedule an appointment through you, you can't.
 			To see the treatments performed and their results, visit the 'Tratamientos' section, which showcases the doctor's experience and success stories.
-			`,
+			Login and signup (top-right corner in landing view) to allow the user to make an appointment and manage profile and patient data.`,
 			Metadata: map[string]interface{}{"topic": "website navigation"},
 		},
 		{

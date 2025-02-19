@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { userLogin, userSignUp } from '../fetch/user'
 import { useToast } from "vue-toastification";
+import { getLastAttemptedRoute } from '../router';
 
 const toast = useToast()
 const route = useRoute()
@@ -34,7 +35,8 @@ const handleLogin = async () => {
             admin: resp.user_data.admin
         }
         localStorage.setItem('user', JSON.stringify(userData))
-        router.replace('/')
+        const redirect = getLastAttemptedRoute() || '/'
+        router.replace(redirect)
     }
 }
 
@@ -51,7 +53,8 @@ const handleSignUp = async () => {
             admin: resp.user_data.admin
         }
         localStorage.setItem('user', JSON.stringify(userData))
-        router.replace('/')
+        const redirect = getLastAttemptedRoute() || '/'
+        router.replace(redirect)
     }
 }
 
@@ -82,11 +85,11 @@ const handleSignUp = async () => {
         <div class="form-container">
             <h1>Registrarse</h1>
             <form @submit.prevent="handleSignUp">
-                <div class="form-group" v-if="!isLogin">
+                <div class="form-group">
                     <label for="name">Nombre</label>
                     <input type="text" id="name" v-model="formData.firstName" required>
                 </div>
-                <div class="form-group" v-if="!isLogin">
+                <div class="form-group">
                     <label for="surname">Apellido</label>
                     <input type="text" id="surname" v-model="formData.lastName" required>
                 </div>

@@ -6,6 +6,7 @@ import Profile from '../views/Profile.vue'
 import Treatments from '../views/Treatments.vue'
 import ApptConfirmation from '../views/ApptConfirmation.vue'
 import Register from '../views/Register.vue'
+import { deleteCookie } from '../fetch/user'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,16 +20,25 @@ const router = createRouter({
             path: '/turnos',
             name: 'appointments',
             component: Appointments,
+            meta: {
+                requiresAuth: true
+            }
         },
         {
             path: '/turnos/confirmar',
             name: 'appointmentConfirmation',
-            component: ApptConfirmation
+            component: ApptConfirmation,
+            meta: {
+                requiresAuth: true
+            }
         },
         {
             path: '/perfil',
             name: 'profile',
-            component: Profile
+            component: Profile,
+            meta: {
+                requiresAuth: true
+            }
         },
         {
             path: '/tratamientos',
@@ -48,4 +58,30 @@ const router = createRouter({
     ]
 })
 
+
+
+let lastAttemptedRoute = null
+router.beforeEach((to, from, next) => {
+    const tokenExists = checkCookie("refresh_token")
+
+    if (to.meta.requiresAuth && !tokenExists) {
+        deleteCookie('access_token')
+        lastAttemptedRoute = to.fullPath
+        next({
+            path: "/registro",
+            query: { mode: 'login' }
+        }) // redirect unauthorized users
+    } else {
+        next() // allow navigation
+    }
+})
+
 export default router
+
+export function checkCookie(name) {
+    return document.cookie.split("; ").some(row => row.startsWith(name + "="))
+}
+
+export function getLastAttemptedRoute() {
+    return lastAttemptedRoute
+}

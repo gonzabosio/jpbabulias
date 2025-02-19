@@ -1,5 +1,13 @@
 <script setup>
-const isLoggedIn = true
+import { onBeforeMount, ref } from 'vue';
+import { checkCookie } from '../router';
+const isLoggedIn = ref(false)
+onBeforeMount(() => {
+    const tokenExist = checkCookie('refresh_token')
+    if (tokenExist) {
+        isLoggedIn.value = true
+    }
+})
 </script>
 
 <template>
@@ -10,7 +18,7 @@ const isLoggedIn = true
         <div id="doctor-name">
             Dr. Juan Pablo Babulias
         </div>
-        <div v-if="isLoggedIn" id="register-container">
+        <div v-if="!isLoggedIn" id="register-container">
             <RouterLink :to="{ path: '/registro', query: { mode: 'login' } }" id="nav-login" class="underline-anim">
                 Iniciar Sesión
             </RouterLink>

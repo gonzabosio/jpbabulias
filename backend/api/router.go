@@ -7,13 +7,11 @@ import (
 
 	"github.com/gonzabosio/jpbabulias/api/handlers"
 	"github.com/gonzabosio/jpbabulias/api/mw"
-	"github.com/gonzabosio/jpbabulias/api/token"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/httprate"
-	"github.com/go-chi/jwtauth/v5"
 )
 
 func NewRouter() (*chi.Mux, error) {
@@ -38,10 +36,11 @@ func NewRouter() (*chi.Mux, error) {
 		r.Post("/signup", h.UserSignUpHandler)
 		r.Post("/login", h.UserLoginHandler)
 		r.Post("/logout", h.LogoutHandler)
+		r.Post("/refresh", h.RefreshAccessTokenHandler)
 	})
 
 	r.Group(func(r chi.Router) {
-		r.Use(jwtauth.Verifier(token.TokenAuth))
+		// r.Use(jwtauth.Verifier(token.TokenAuth))
 		r.Use(mw.Authenticator)
 		r.Route("/appointment", func(r chi.Router) {
 			r.Post("/", h.AddAppointmentHandler)
@@ -54,10 +53,10 @@ func NewRouter() (*chi.Mux, error) {
 		r.Route("/patient", func(r chi.Router) {
 			r.Get("/{user_id}", h.GetPatientsByUserIdHandler)
 		})
+	})
 
-		r.Route("/bot", func(r chi.Router) {
-			r.Post("/prompt", h.SendPromptHandler)
-		})
+	r.Route("/bot", func(r chi.Router) {
+		r.Post("/prompt", h.SendPromptHandler)
 	})
 	return r, nil
 }

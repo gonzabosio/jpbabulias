@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
@@ -22,12 +23,24 @@ func hashPassword(password string) (hashedPassword string, err error) {
 }
 
 func SetCookie(w http.ResponseWriter, name, value string, maxAge int) {
+	domain := os.Getenv("DOMAIN")
+	isLocal := false
+	if domain == "localhost" {
+		isLocal = true
+	}
 	http.SetCookie(w, &http.Cookie{
 		Name:     name,
 		Value:    value,
-		HttpOnly: true,
+		HttpOnly: false,
 		MaxAge:   maxAge,
 		Path:     "/",
-		SameSite: http.SameSiteStrictMode,
+		Domain:   domain,
+		SameSite: func() http.SameSite {
+			if isLocal {
+				return http.SameSiteLaxMode
+			}
+			return http.SameSiteNoneMode
+		}(),
+		Secure: !isLocal,
 	})
 }

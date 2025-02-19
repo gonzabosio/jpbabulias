@@ -1,5 +1,4 @@
 <script setup>
-import Chatbot from '../components/Chatbot.vue'
 
 const descriptionList = [
     'Más de X años de experiencia como profesional',

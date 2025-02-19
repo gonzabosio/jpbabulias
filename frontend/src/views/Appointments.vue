@@ -9,9 +9,20 @@ const router = useRouter()
 const toast = useToast()
 const fullDates = ref([])
 onBeforeMount(async () => {
-    // const result = await getFullyBookedDates()
+    const result = await getFullyBookedDates()
+    if (result.error) {
+        if (result.code === 401) {
+            toast.info(result.message)
+            router.replace({
+                path: '/registro',
+                query: { mode: 'login' }
+            })
+            return
+        }
+        toast.error('No se cargaron las fechas sin turnos libres. Recargue la página')
+    }
     // console.log(result.fully_booked_dates)
-    // fullDates.value = result.fully_booked_dates.map(date => new Date(date))
+    fullDates.value = result.fully_booked_dates.map(date => new Date(date))
 })
 
 const selectedDate = ref(new Date())
@@ -90,6 +101,14 @@ const onDayClick = async (day) => {
         isLoading.value = true
         const result = await getDayAppointments(selectedDate.value.toISOString())
         if (result.error) {
+            if (result.code === 401) {
+                toast.info(result.message)
+                router.replace({
+                    path: '/registro',
+                    query: { mode: 'login' }
+                })
+                return
+            }
             console.error('Failed to get available appointments', result.message)
             isLoading.value = false
             toast.error('Ocurrió un error al intentar cargar los horarios', {
