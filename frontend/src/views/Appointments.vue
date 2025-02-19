@@ -83,8 +83,7 @@ const onDayClick = async (day) => {
             // if clicked day is in the array of dates
             isDateInArray = attr.dates.some(date => date.toISOString().split('T')[0] === day.date.toISOString().split('T')[0])
             if (isDateInArray) {
-                toast.warning('La fecha seleccionada esta completamente llena')
-                // console.log('Date is fully booked 🔒')
+                toast.warning('No quedan turnos disponibles en esa fecha')
                 return
             }
         } else if (typeof attr.dates === 'object' && attr.dates.start && attr.dates.end) {
@@ -92,7 +91,6 @@ const onDayClick = async (day) => {
             isWithinRange = clickedDate >= attr.dates.start && clickedDate <= attr.dates.end
             if (isWithinRange) {
                 toast.warning('El consultorio no abre durante el día seleccionado')
-                // console.log('Closed for holidays 🌴')
                 return
             }
         }

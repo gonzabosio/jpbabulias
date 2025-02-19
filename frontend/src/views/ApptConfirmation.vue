@@ -2,23 +2,25 @@
 import { reactive, computed, ref, onMounted, onBeforeMount, watch } from 'vue'
 import { getPatientsDataByUserId } from '../fetch/patient'
 import { useToast } from "vue-toastification";
+import { saveAppointment } from '../fetch/appt';
+import { useRouter } from 'vue-router';
 
 const toast = useToast()
-
-const localStoredUserDate = JSON.parse(localStorage.getItem("user") || "{}")
+const router = useRouter()
+const localStoredUserDate = JSON.parse(localStorage.getItem("user") || {})
 
 const patients = ref([])
 const patientSelected = ref({})
-const patientSelectedId = ref('')
-
+const indexSelected = ref(0)
 onBeforeMount(async () => {
+    window.scrollTo(0, 0)
     setTimeout(async () => {
         if (!patients.value.length) {
             // show loading spinner component while getting patient data
             const response = await getPatientsDataByUserId(localStoredUserDate.user_id)
             if (response.error) {
-                if (result.code === 401) {
-                    toast.info(result.message)
+                if (response.code === 401) {
+                    toast.info(response.message)
                     router.replace({
                         path: '/registro',
                         query: { mode: 'login' }
@@ -29,23 +31,18 @@ onBeforeMount(async () => {
                 toast.error('Error al intentar cargar datos del paciente')
             } else {
                 patients.value = response.patients
-                const defaultPatient = patients.value.find(opt => opt.main)
-                if (defaultPatient) {
-                    patientSelected.value = defaultPatient
-                    patientSelectedId.value = patientSelected.value.id
-                } else {
+                patientSelected.value = patients.value.find(opt => opt.main)
+                if (!patientSelected.value) {
                     toast.error('Error al intentar cargar datos del paciente')
                 }
-                console.log('Selected:', patientSelected.value)
             }
         }
 
     }, 500)
 })
 
-watch(patientSelectedId, async (newId) => {
-    console.log('search data of:', newId)
-    // load data from new patient selected
+watch(indexSelected, async (newIdx) => {
+    patientSelected.value = patients.value[newIdx]
 })
 
 const f = new Intl.DateTimeFormat('es-ar', {
@@ -58,7 +55,6 @@ const dateToConfirm = f.format(selectedDate)
 
 const formData = reactive({
     subject: "",
-    fullName: "",
     email: localStoredUserDate.email,
     phone: "",
     dni: "",
@@ -67,19 +63,15 @@ const formData = reactive({
 
 watch(patientSelected, (loadedPatient) => {
     if (loadedPatient) {
-        formData.fullName = loadedPatient.first_name + ' ' + loadedPatient.last_name
         formData.phone = loadedPatient.phone_number
         formData.dni = loadedPatient.dni
         formData.hin = loadedPatient.health_insurance
     }
 })
 
-const isSubmitted = ref(false)
-
 const isFormValid = computed(() => {
     return (
         formData.subject &&
-        formData.fullName &&
         formData.email &&
         formData.phone &&
         formData.dni &&
@@ -87,13 +79,35 @@ const isFormValid = computed(() => {
     )
 })
 
-const submitForm = () => {
+const submitForm = async () => {
+    const year = selectedDate.getUTCFullYear();
+    const month = String(selectedDate.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getUTCDate()).padStart(2, '0');
+    const hours = String(selectedDate.getUTCHours() - 3);
+    const minutes = String(selectedDate.getUTCMinutes()).padStart(2, '0');
+    const seconds = String(selectedDate.getUTCSeconds()).padStart(2, '0');
+    // format: 'YYYY-MM-DDTHH:MM:SSZ'
+    const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
+
+    console.log(formattedDate);
     if (isFormValid.value) {
-        let cleanedPhoneNumber = formData.phone.replace(/[^\d]/g, '');
-        formData.phone = cleanedPhoneNumber
         console.log('Form submitted:', formData)
-        isSubmitted.value = true
-        // send the data to a server
+        const result = await saveAppointment(formattedDate, formData.subject, patientSelected.value.id)
+        if (result.error) {
+            if (result.code === 401) {
+                toast.info(result.message)
+                router.replace({
+                    path: '/registro',
+                    query: { mode: 'login' }
+                })
+                return
+            }
+            console.error(result.message)
+            toast.error('No se pudo agendar el turno. Intente nuevamente')
+        } else {
+            toast.success('Turno agendado')
+            router.replace('/perfil')
+        }
     }
 }
 
@@ -103,19 +117,18 @@ const submitForm = () => {
     <div class="form-container">
         <h2>Confirma tu turno</h2>
         <p>{{ String(dateToConfirm).charAt(0).toUpperCase() + String(dateToConfirm).slice(1) }}</p>
-        <select v-if="patientSelectedId" name="patient" id="patient-selection" v-model="patientSelectedId">
-            <option v-for="patient in patients" :key="patient.id" :value="String(patient.id)">
-                {{ patient.first_name + ' ' + patient.last_name }}
-            </option>
-        </select>
+        <div id="patient-select-container">
+            <select v-if="patients" name="patient" id="patient-selection" v-model="indexSelected">
+                <option v-for="(patient, index) in patients" :key="index" :value="index">
+                    {{ patient.first_name + ' ' + patient.last_name }}
+                </option>
+            </select>
+            <button @click="router.push('/perfil')" id="btn-add-patient">Añadir</button>
+        </div>
         <form @submit.prevent="submitForm">
             <div class="form-group">
-                <label for="subject">Asunto (max. 50 caracteres)</label>
+                <label for="subject">Asunto (máx. 50 caracteres)</label>
                 <input type="text" id="subject" v-model="formData.subject" required maxlength="50" />
-            </div>
-            <div class="form-group">
-                <label for="fullName">Nombre completo</label>
-                <input type="text" id="fullName" v-model="formData.fullName" disabled />
             </div>
             <div class="form-group">
                 <label for="email">Correo</label>
@@ -123,7 +136,7 @@ const submitForm = () => {
             </div>
             <div class="form-group">
                 <label for="phone">Número de teléfono</label>
-                <input type="tel" id="phone" v-model="formData.phone" placeholder="3564101010" required />
+                <input type="tel" id="phone" v-model="formData.phone" disabled />
             </div>
             <div class="form-group">
                 <label for="dni">DNI</label>
@@ -135,13 +148,14 @@ const submitForm = () => {
             </div>
             <button type="submit" :disabled="!isFormValid">Confirmar</button>
         </form>
-        <div v-if="isSubmitted" class="success-message">
-            Turno agendado 📆
-        </div>
     </div>
 </template>
 
 <style scoped>
+* {
+    font-family: poppins-regular;
+}
+
 .form-container {
     max-width: 500px;
     margin: 5em auto;
@@ -195,14 +209,13 @@ input[type="number"] {
     font-size: 16px;
 }
 
-button {
+button[type="submit"] {
     width: 90%;
     padding: 12px;
     margin-top: 2em;
     background-color: #3790D0;
     font-weight: 600;
     color: white;
-    border: none;
     border-radius: 0.5em;
     font-size: 1.2rem;
     cursor: pointer;
@@ -223,7 +236,7 @@ button {
     }
 }
 
-button:disabled {
+button[type="submit"]:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
 }
@@ -236,5 +249,38 @@ button:disabled {
     color: #3c763d;
     border-radius: 4px;
     text-align: center;
+}
+
+#patient-select-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* background-color: #333; */
+}
+
+#btn-add-patient {
+    width: 30%;
+    height: 30px;
+    background-color: #3790D0;
+    color: #EEEEEE;
+    border: 4px solid transparent;
+    border-radius: 0.5em;
+
+    &:hover {
+        border: 4px solid #2176b3;
+    }
+
+}
+
+@media (max-width: 330px) {
+    #patient-select-container {
+        flex-direction: column;
+
+        button,
+        select {
+            margin-top: 1em;
+            width: 90%;
+        }
+    }
 }
 </style>
