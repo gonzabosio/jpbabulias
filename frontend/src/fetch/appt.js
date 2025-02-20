@@ -10,18 +10,11 @@ export const getDayAppointments = async (date, retry = true) => {
         const payload = await resp.json()
         if (!resp.ok) {
             if (resp.status === 401) {
-                if (retry && checkCookie('refresh_token')) {
+                if (retry && checkCookie('access_token')) {
                     return await getDayAppointments(date, false)
                 } else {
-                    const result = await logout()
-                    if (result.error) {
-                        console.error(result.message)
-                        const logoutResp = await logout()
-                        if (logoutResp.error) {
-                            deleteCookie('access_token')
-                            deleteCookie('refresh_token')
-                            return { error: true, code: 401, message: 'Sesión expirada' }
-                        }
+                    const logoutResp = await logout()
+                    if (logoutResp.error) {
                         return { error: true, code: 401, message: 'Sesión expirada' }
                     }
                     return { error: true, code: 401, message: 'Sesión expirada' }
@@ -45,18 +38,11 @@ export const getFullyBookedDates = async (retry = true) => {
         const payload = await resp.json()
         if (!resp.ok) {
             if (resp.status === 401) {
-                if (retry && checkCookie('refresh_token')) {
+                if (retry && checkCookie('access_token')) {
                     return await getFullyBookedDates(false)
                 } else {
-                    const result = await logout()
-                    if (result.error) {
-                        console.error(result.message)
-                        const logoutResp = await logout()
-                        if (logoutResp.error) {
-                            deleteCookie('access_token')
-                            deleteCookie('refresh_token')
-                            return { error: true, code: 401, message: 'Sesión expirada' }
-                        }
+                    const logoutResp = await logout()
+                    if (logoutResp.error) {
                         return { error: true, code: 401, message: 'Sesión expirada' }
                     }
                     return { error: true, code: 401, message: 'Sesión expirada' }
@@ -87,18 +73,11 @@ export const saveAppointment = async (apptDate, subject, patientId, retry = true
         const payload = await resp.json()
         if (!resp.ok) {
             if (resp.status === 401) {
-                if (retry && checkCookie('refresh_token')) {
+                if (retry && checkCookie('access_token')) {
                     return await saveAppointment(apptDate, subject, patientId, retry, false)
                 } else {
-                    const result = await logout()
-                    if (result.error) {
-                        console.error(result.message)
-                        const logoutResp = await logout()
-                        if (logoutResp.error) {
-                            deleteCookie('access_token')
-                            deleteCookie('refresh_token')
-                            return { error: true, code: 401, message: 'Sesión expirada' }
-                        }
+                    const logoutResp = await logout()
+                    if (logoutResp.error) {
                         return { error: true, code: 401, message: 'Sesión expirada' }
                     }
                     return { error: true, code: 401, message: 'Sesión expirada' }

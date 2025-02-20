@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onBeforeMount, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onBeforeMount, reactive, ref, watch, watchEffect } from 'vue';
 import { getPatientsDataByUserId, savePatient } from '../fetch/patient';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
@@ -32,10 +32,15 @@ const loadUserAndPatients = async () => {
 }
 
 onBeforeMount(() => {
-    localUserData.value = JSON.parse(localStorage.getItem('user'))
+    const userData = localStorage.getItem('user')
+    if (userData) {
+        localUserData.value = JSON.parse(userData)
+    }
 })
-onMounted(() => {
-    loadUserAndPatients()
+watchEffect(async () => {
+    if (localUserData.value) {
+        await loadUserAndPatients()
+    }
 })
 
 const selectedIdx = ref(0)
@@ -106,7 +111,7 @@ const handleLogout = async () => {
         </section>
 
         <div v-if="dbPatients && localUserData && !addPatientForm">
-            <section id="patients-sections">
+            <section id="patients-section">
                 <button @click="addPatientForm = true" id="btn-add-patient">Añadir paciente</button>
                 <p>Seleccionar paciente</p>
                 <select name="patients" id="select-patient" v-model="selectedIdx">
@@ -122,10 +127,13 @@ const handleLogout = async () => {
                     </ul>
                     <p>Turnos:</p>
                     <div v-if="patientAppts" v-for="it in patientAppts" class="appt-card">
-                        <span>{{ new Date(it.appt_date).toLocaleString('es-ar', { timeZone: 'UTC' }) }}</span>
+                        <span>{{ new Date(it.appt_date).toLocaleString('es-ar', {
+                            timeZone: 'UTC', dateStyle: "short",
+                            timeStyle: "short"
+                        }) }}</span>
                     </div>
-                    <p>❗Para cancelar un turno. Comuníquese directamente con el consultorio.</p>
                 </div>
+                <p>❗Para cancelar un turno. Comuníquese directamente con el consultorio.</p>
             </section>
         </div>
         <div v-if="addPatientForm" class="form-container">
@@ -195,6 +203,10 @@ const handleLogout = async () => {
     }
 }
 
+#patients-section {
+    margin: 1em;
+}
+
 #patient-data {
     display: flex;
     flex-direction: column;
@@ -212,7 +224,7 @@ const handleLogout = async () => {
     padding: 0.5em;
     background-color: #fff;
     border: 2px solid gray;
-    margin: 8px 0;
+    margin-bottom: 1em;
     border-radius: 0.5em;
 }
 

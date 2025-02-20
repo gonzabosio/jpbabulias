@@ -1,3 +1,4 @@
+import { removeUserData } from '../components/scripts/topBarRef'
 import { backurl, domain } from '../main'
 
 export const userSignUp = async (formData) => {
@@ -23,7 +24,6 @@ export const userSignUp = async (formData) => {
         )
         const payload = await resp.json()
         if (!resp.ok) {
-            console.error(payload.error_dets)
             return { error: true, code: resp.status, message: payload.message }
         }
         return { error: false, code: resp.status, user_data: payload.user_data }
@@ -50,7 +50,6 @@ export const userLogin = async (email, password) => {
         )
         const payload = await resp.json()
         if (!resp.ok) {
-            console.error(payload.error_dets)
             return { error: true, code: resp.status, message: payload.message }
         }
         return { error: false, code: resp.status, user_data: payload.user_data }
@@ -67,19 +66,18 @@ export const logout = async (retry = true) => {
             credentials: 'include'
         })
         if (!resp.ok) {
-            console.error('Failed to logout')
             if (retry) {
                 return await logout(false)
-            } else {
-                deleteCookie('refresh_token')
-                deleteCookie('access_token')
-                return { error: false, code: resp.status, message: 'Sesión cerrada' }
             }
+            removeUserData()
+            return { error: false, code: resp.status, message: 'Sesión cerrada' }
         }
+        removeUserData()
         return { error: false, code: resp.status, message: 'Sesión cerrada' }
     } catch (error) {
         console.error(error.message)
-        return { error: true, code: 0, message: error.message }
+        removeUserData()
+        return { error: true, code: 401, message: error.message }
     }
 }
 

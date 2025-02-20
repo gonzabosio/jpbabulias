@@ -57,6 +57,9 @@ func Authenticator(next http.Handler) http.Handler {
 				return
 			}
 			handlers.SetCookie(w, "access_token", aToken, token.ATMaxAgeStd)
+			handlers.WriteJSON(w, map[string]string{
+				"message": "Updated access token",
+			}, http.StatusUnauthorized)
 			return
 		}
 

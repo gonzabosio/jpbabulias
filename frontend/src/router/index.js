@@ -65,7 +65,7 @@ router.beforeEach((to, from, next) => {
     const tokenExists = checkCookie("refresh_token")
 
     if (to.meta.requiresAuth && !tokenExists) {
-        deleteCookie('access_token')
+        // deleteCookie('access_token')
         lastAttemptedRoute = to.fullPath
         next({
             path: "/registro",

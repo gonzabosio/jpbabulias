@@ -1,5 +1,6 @@
 import { backurl } from "../main"
-import { deleteCookie, logout } from "./user"
+import { checkCookie } from "../router"
+import { logout } from "./user"
 
 export const getPatientsDataByUserId = async (userId, retry = true) => {
     try {
@@ -9,20 +10,11 @@ export const getPatientsDataByUserId = async (userId, retry = true) => {
         const payload = await resp.json()
         if (!resp.ok) {
             if (resp.status === 401) {
-                console.log('retry')
-                if (retry && checkCookie('refresh_token')) {
+                if (retry && checkCookie('access_token')) {
                     return await getPatientsDataByUserId(userId, false)
                 } else {
-                    console.log('trigger logout')
-                    const result = await logout()
-                    if (result.error) {
-                        console.error(result.message)
-                        const logoutResp = await logout()
-                        if (logoutResp.error) {
-                            deleteCookie('access_token')
-                            deleteCookie('refresh_token')
-                            return { error: true, code: 401, message: 'Sesión expirada' }
-                        }
+                    const logoutResp = await logout()
+                    if (logoutResp.error) {
                         return { error: true, code: 401, message: 'Sesión expirada' }
                     }
                     return { error: true, code: 401, message: 'Sesión expirada' }
@@ -57,18 +49,11 @@ export const savePatient = async (formData, userId, retry = true) => {
         const payload = await resp.json()
         if (!resp.ok) {
             if (resp.status === 401) {
-                if (retry && checkCookie('refresh_token')) {
+                if (retry && checkCookie('access_token')) {
                     return await savePatient(formData, userId, false)
                 } else {
-                    const result = await logout()
-                    if (result.error) {
-                        console.error(result.message)
-                        const logoutResp = await logout()
-                        if (logoutResp.error) {
-                            deleteCookie('access_token')
-                            deleteCookie('refresh_token')
-                            return { error: true, code: 401, message: 'Sesión expirada' }
-                        }
+                    const logoutResp = await logout()
+                    if (logoutResp.error) {
                         return { error: true, code: 401, message: 'Sesión expirada' }
                     }
                     return { error: true, code: 401, message: 'Sesión expirada' }

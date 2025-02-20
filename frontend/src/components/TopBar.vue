@@ -1,20 +1,15 @@
 <script setup>
-import { onBeforeMount, onMounted, ref, watch } from 'vue';
-import { checkCookie } from '../router';
-const isLoggedIn = ref(false)
-const userData = ref(null)
+import { onBeforeMount, ref, watch } from 'vue';
+import { isLoggedIn, userData, switchAuthStatus } from '../components/scripts/topBarRef'
 onBeforeMount(() => {
-    const tokenExist = checkCookie('refresh_token')
-    if (tokenExist) {
-        isLoggedIn.value = true
-    }
+    switchAuthStatus()
 })
-onMounted(() => {
-    userData.value = JSON.parse(localStorage.getItem('user'))
-})
+
 const profileLett = ref('')
 watch(userData, () => {
-    profileLett.value = String(userData.value.email).at(0).toLocaleUpperCase()
+    if (userData.value) {
+        profileLett.value = String(userData.value.email).at(0).toLocaleUpperCase()
+    }
 })
 </script>
 
@@ -34,7 +29,7 @@ watch(userData, () => {
                 Registrarse
             </RouterLink>
         </div>
-        <div v-else class="header-right" v-if="userData">
+        <div v-else class="header-right">
             <RouterLink to="/perfil" id="nav-profile">
                 <span id="letter">{{ profileLett }}</span>
             </RouterLink>
