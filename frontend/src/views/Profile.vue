@@ -3,15 +3,16 @@ import { computed, onBeforeMount, onMounted, reactive, ref, watch } from 'vue';
 import { getPatientsDataByUserId, savePatient } from '../fetch/patient';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
+import { deleteCookie, logout } from '../fetch/user';
 
 const toast = useToast()
 const router = useRouter()
 
 const localUserData = ref(null)
 const dbPatients = ref(null)
-const patientToShow = ref({})
+const personToShow = ref({})
 const addPatientForm = ref(false)
-
+const patientAppts = ref([])
 const loadUserAndPatients = async () => {
     const result = await getPatientsDataByUserId(localUserData.value["user_id"])
     if (result.error) {
@@ -23,13 +24,11 @@ const loadUserAndPatients = async () => {
             })
             return
         }
-        console.log(result.message)
         toast.error('No se cargaron tus datos correctamente. Recargue la página')
     }
-    // console.log(result.patients)
     dbPatients.value = result.patients
-    patientToShow.value = dbPatients.value.find(patient => patient.main)
-    // console.log(patientToShow.value)
+    personToShow.value = dbPatients.value.find(it => it.patient.main)
+    patientAppts.value = personToShow.value.appointments
 }
 
 onBeforeMount(() => {
@@ -41,7 +40,8 @@ onMounted(() => {
 
 const selectedIdx = ref(0)
 watch(selectedIdx, (currentIdx) => {
-    patientToShow.value = dbPatients.value[currentIdx]
+    personToShow.value = dbPatients.value[currentIdx]
+    patientAppts.value = personToShow.value.appointments
 })
 
 const formData = reactive({
@@ -84,6 +84,18 @@ const submitForm = async () => {
         toast.success('Paciente agregado')
     }
 }
+
+const handleLogout = async () => {
+    const result = await logout()
+    if (result.error) {
+        deleteCookie('access_token')
+        deleteCookie('refresh_token')
+        router.replace('/')
+        return
+    }
+    localStorage.removeItem('user')
+    router.replace('/')
+}
 </script>
 
 <template>
@@ -95,20 +107,25 @@ const submitForm = async () => {
 
         <div v-if="dbPatients && localUserData && !addPatientForm">
             <section id="patients-sections">
+                <button @click="addPatientForm = true" id="btn-add-patient">Añadir paciente</button>
                 <p>Seleccionar paciente</p>
                 <select name="patients" id="select-patient" v-model="selectedIdx">
-                    <option :value="index" v-for="(patient, index) in dbPatients" :key="index">
-                        {{ patient.first_name + ' ' + patient.last_name }}
+                    <option :value="index" v-for="(it, index) in dbPatients" :key="index">
+                        {{ it.patient.first_name + ' ' + it.patient.last_name }}
                     </option>
                 </select>
-                <div id="patient-data" v-if="patientToShow">
+                <div id="patient-data" v-if="personToShow">
                     <ul>
-                        <li>Teléfono: {{ patientToShow.phone_number }}</li>
-                        <li>DNI: {{ patientToShow.dni }}</li>
-                        <li>Obra Social: {{ patientToShow.health_insurance }}</li>
+                        <li>Teléfono: {{ personToShow.patient.phone_number }}</li>
+                        <li>DNI: {{ personToShow.patient.dni }}</li>
+                        <li>Obra Social: {{ personToShow.patient.health_insurance }}</li>
                     </ul>
+                    <p>Turnos:</p>
+                    <div v-if="patientAppts" v-for="it in patientAppts" class="appt-card">
+                        <span>{{ new Date(it.appt_date).toLocaleString('es-ar', { timeZone: 'UTC' }) }}</span>
+                    </div>
+                    <p>❗Para cancelar un turno. Comuníquese directamente con el consultorio.</p>
                 </div>
-                <button @click="addPatientForm = true" id="btn-add-patient">Añadir paciente</button>
             </section>
         </div>
         <div v-if="addPatientForm" class="form-container">
@@ -141,7 +158,7 @@ const submitForm = async () => {
             </form>
             <button @click="addPatientForm = false" id="btn-cancel">Cancelar</button>
         </div>
-        <button @click="router.replace('/')" id="btn-logout">Cerrar sesión</button>
+        <button @click="handleLogout" id="btn-logout">Cerrar sesión</button>
 
     </div>
 </template>
@@ -179,7 +196,24 @@ const submitForm = async () => {
 }
 
 #patient-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: left;
+    margin: 1em;
+}
+
+.appt-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    padding: 0.5em;
+    background-color: #fff;
+    border: 2px solid gray;
+    margin: 8px 0;
+    border-radius: 0.5em;
 }
 
 .form-container {

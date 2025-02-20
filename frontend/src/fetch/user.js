@@ -60,7 +60,7 @@ export const userLogin = async (email, password) => {
     }
 }
 
-export const logout = async () => {
+export const logout = async (retry = true) => {
     try {
         const resp = await fetch(backurl + '/user/logout', {
             method: 'POST',
@@ -68,7 +68,13 @@ export const logout = async () => {
         })
         if (!resp.ok) {
             console.error('Failed to logout')
-            return { error: true, code: resp.status, message: 'No se pudo cerrar sesión' }
+            if (retry) {
+                return await logout(false)
+            } else {
+                deleteCookie('refresh_token')
+                deleteCookie('access_token')
+                return { error: false, code: resp.status, message: 'Sesión cerrada' }
+            }
         }
         return { error: false, code: resp.status, message: 'Sesión cerrada' }
     } catch (error) {

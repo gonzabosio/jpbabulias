@@ -12,7 +12,7 @@ import (
 )
 
 func (h *Handler) AddAppointmentHandler(w http.ResponseWriter, r *http.Request) {
-	reqbody := new(model.Appointment)
+	reqbody := new(model.InsertAppointment)
 	if err := json.NewDecoder(r.Body).Decode(&reqbody); err != nil {
 		WriteJSON(w, map[string]string{
 			"message":    "Appointment data decodification error",

@@ -3,6 +3,13 @@ package model
 import "time"
 
 type Appointment struct {
+	ID        int       `json:"id"`
+	ApptDate  time.Time `json:"appt_date" validate:"required"`
+	Subject   string    `json:"subject" validate:"required"`
+	PatientID int       `json:"patient_id" validate:"required"`
+}
+
+type InsertAppointment struct {
 	ID        string    `json:"id"`
 	ApptDate  time.Time `json:"appt_date" validate:"required"`
 	Subject   string    `json:"subject" validate:"required"`

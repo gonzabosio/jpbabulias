@@ -139,10 +139,8 @@ const onDayClick = async (day) => {
 
 const isFriday = (day) => {
     if (day > 0 && day < 5) {
-        // console.log('lunes-jueves')
         return false
     } else {
-        // console.log('viernes')
         return true
     }
 }

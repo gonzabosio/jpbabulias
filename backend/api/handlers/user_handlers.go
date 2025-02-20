@@ -135,8 +135,6 @@ func (h *Handler) UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}, http.StatusOK)
 }
 
-func (h *Handler) RefreshAccessTokenHandler(w http.ResponseWriter, r *http.Request) {}
-
 func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	SetCookie(w, "access_token", "", -1)
 	SetCookie(w, "refresh_token", "", -1)

@@ -9,7 +9,7 @@ import (
 )
 
 type AppointmentRepository interface {
-	SaveAppointment(appt *model.Appointment) error
+	SaveAppointment(appt *model.InsertAppointment) error
 	ReadAppointmentsByUserId(userIdStr string) (*[]model.AppointmentList, error)
 	ReadAppointmentsByDay(day string) (*[]string, error)
 	ReadFullyBookedDates() (*[]string, error)
@@ -18,7 +18,7 @@ type AppointmentRepository interface {
 
 // var _ AppointmentRepository = (*PostgreService)(nil)
 
-func (p *PostgreService) SaveAppointment(appt *model.Appointment) error {
+func (p *PostgreService) SaveAppointment(appt *model.InsertAppointment) error {
 	var apptID int
 	patientIdNum, err := strconv.ParseInt(appt.PatientID, 10, 64)
 	if err != nil {

@@ -36,11 +36,9 @@ func NewRouter() (*chi.Mux, error) {
 		r.Post("/signup", h.UserSignUpHandler)
 		r.Post("/login", h.UserLoginHandler)
 		r.Post("/logout", h.LogoutHandler)
-		r.Post("/refresh", h.RefreshAccessTokenHandler)
 	})
 
 	r.Group(func(r chi.Router) {
-		// r.Use(jwtauth.Verifier(token.TokenAuth))
 		r.Use(mw.Authenticator)
 		r.Route("/appointment", func(r chi.Router) {
 			r.Post("/", h.AddAppointmentHandler)

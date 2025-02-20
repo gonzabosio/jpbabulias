@@ -30,12 +30,12 @@ func (h *Handler) GetPatientsByUserIdHandler(w http.ResponseWriter, r *http.Requ
 	}
 	WriteJSON(w, map[string]interface{}{
 		"message":  "Patients retrieved",
-		"patients": patientsList,
+		"patients": &patientsList,
 	}, http.StatusOK)
 }
 
 func (h *Handler) AddPatientHandler(w http.ResponseWriter, r *http.Request) {
-	var reqBody model.Patient
+	var reqBody model.InsertPatient
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		WriteJSON(w, map[string]string{
 			"message":    "Patient data decodification error",
