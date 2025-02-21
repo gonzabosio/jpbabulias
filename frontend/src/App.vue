@@ -2,7 +2,7 @@
 import { RouterView } from 'vue-router';
 import TopBar from '../src/components/TopBar.vue'
 import Footer from '../src/components/Footer.vue'
-import Chatbot from '../src/Components/Chatbot.vue'
+import Chatbot from '../src/components/Chatbot.vue'
 
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
