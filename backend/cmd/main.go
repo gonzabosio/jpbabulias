@@ -24,7 +24,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to setup backend server: %v", err)
 	}
-	if err := http.ListenAndServe(":"+os.Getenv("BACKEND_PORT"), r); err != nil {
-		log.Fatalf("Unable to start backend server on port %s: %v", os.Getenv("BACKEND_PORT"), err)
+	log.Printf("Server running on: %s", os.Getenv("PORT"))
+	if err := http.ListenAndServe(":"+os.Getenv("PORT"), r); err != nil {
+		log.Fatalf("Unable to start backend server on port %s: %v", os.Getenv("PORT"), err)
 	}
 }
