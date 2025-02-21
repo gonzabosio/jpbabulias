@@ -1,28 +1,46 @@
 :root {
-  font-family: Inter, system-ui, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  font-family: poppins-regular, sans-serif;
+  color-scheme: light;
+  color: #121215;
+  background-color: #EEEEEE;
+  font-weight: 600;
+}
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+body,
+html {
+  height: 100%;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
 }
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
-button {
-  font-family: Inter, system-ui, Arial, sans-serif;
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #b3b3b3;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #363636;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #252525;
+}
+
+@font-face {
+  font-family: 'poppins-regular';
+  src: url('../src/fonts/Poppins-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'poppins-bold';
+  src: url('../src/fonts/Poppins-Bold.ttf');
 }

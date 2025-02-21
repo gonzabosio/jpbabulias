@@ -3,7 +3,9 @@ package repository
 import "database/sql"
 
 type Service interface {
-	LanguageRepository
+	AppointmentRepository
+	PatientRepository
+	UserRepository
 }
 
 type PostgreService struct {
