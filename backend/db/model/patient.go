@@ -26,3 +26,12 @@ type InsertPatient struct {
 	Main            bool   `json:"main"`
 	UserID          string `json:"user_id" validate:"required"`
 }
+
+type UpdatePatient struct {
+	ID              string `json:"id" validate:"required"`
+	FirstName       string `json:"first_name" validate:"required"`
+	LastName        string `json:"last_name" validate:"required"`
+	PhoneNumber     string `json:"phone_number" validate:"required"`
+	Dni             string `json:"dni" validate:"required"`
+	HealthInsurance string `json:"health_insurance" validate:"required"`
+}

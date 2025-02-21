@@ -17,7 +17,7 @@ onBeforeMount(async () => {
     setTimeout(async () => {
         if (!patientsList.value.length) {
             const response = await getPatientsDataByUserId(localStoredUserData.user_id)
-            console.log(response)
+            // console.log(response)
             if (response.error) {
                 if (response.code === 401) {
                     toast.info(response.message)
@@ -27,7 +27,7 @@ onBeforeMount(async () => {
                     })
                     return
                 }
-                console.error(response.message)
+                // console.error(response.message)
                 toast.error('Error al intentar cargar datos del paciente')
             } else {
                 patientsList.value = response.patients
@@ -88,9 +88,9 @@ const submitForm = async () => {
     // format: 'YYYY-MM-DDTHH:MM:SSZ'
     const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
 
-    console.log(formattedDate);
+    // console.log(formattedDate);
     if (isFormValid.value) {
-        console.log('Form submitted:', formData)
+        // console.log('Form submitted:', formData)
         const result = await saveAppointment(formattedDate, formData.subject, patientSelected.value.patient.id, localStoredUserData.email)
         if (result.error) {
             if (result.code === 401) {

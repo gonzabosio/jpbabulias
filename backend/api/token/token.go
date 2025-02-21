@@ -13,8 +13,8 @@ func NewTokenAuth() {
 	TokenAuth = jwtauth.New("HS256", []byte(os.Getenv("JWT_SECRET")), nil)
 }
 
-var ATMaxAgeStd = int(10 * time.Minute / time.Second)
-var RTMaxAgeStd = int(20 * time.Minute / time.Second)
+var ATMaxAgeStd = int(1 * time.Hour / time.Second)
+var RTMaxAgeStd = int(24 * time.Hour / time.Second)
 
 func GenerateAccessToken(userID string) (accessToken string, err error) {
 	accessClaims := map[string]interface{}{

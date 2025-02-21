@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onBeforeMount, reactive, ref, watch, watchEffect } from 'vue';
-import { getPatientsDataByUserId, savePatient } from '../fetch/patient';
+import { deletePatientById, editPatientData, getPatientsDataByUserId, savePatient } from '../fetch/patient';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import { deleteCookie, logout } from '../fetch/user';
@@ -101,6 +101,51 @@ const handleLogout = async () => {
     localStorage.removeItem('user')
     router.replace('/')
 }
+
+const modifPatientForm = ref(false)
+const handleModifPatientForm = (patient) => {
+    formData.firstName = patient.first_name
+    formData.lastName = patient.last_name
+    formData.dni = patient.dni
+    formData.phone = patient.phone_number.replace(/^\+54/, "")
+    formData.hin = patient.health_insurance
+    modifPatientForm.value = true
+}
+
+const submitModifPatientForm = async () => {
+    const result = await editPatientData(formData, personToShow.value.patient.id)
+    if (result.error) {
+        if (result.code === 401) {
+            toast.info(result.message)
+            router.replace({
+                path: '/registro',
+                query: { mode: 'login' }
+            })
+            return
+        }
+        toast.error('No se pudo actualizar los datos del paciente')
+    }
+    toast.success('Datos del paciente actualizados')
+    modifPatientForm.value = false
+}
+
+const handleDeletePatient = async (patientId) => {
+    const result = await deletePatientById(patientId)
+    if (result.error) {
+        if (result.code === 401) {
+            toast.info(result.message)
+            router.replace({
+                path: '/registro',
+                query: { mode: 'login' }
+            })
+        } else if (result.code === 409) {
+            toast.error('El paciente tiene citas pendientes. No se puede eliminar')
+        } else {
+            toast.error('No se pudo eliminar el paciente. Intente de nuevo')
+        }
+    }
+    toast.success('Paciente eliminado')
+}
 </script>
 
 <template>
@@ -110,9 +155,9 @@ const handleLogout = async () => {
             <article>{{ localUserData.email }}</article>
         </section>
 
-        <div v-if="dbPatients && localUserData && !addPatientForm">
+        <div v-if="dbPatients && localUserData && !addPatientForm && !modifPatientForm">
             <section id="patients-section">
-                <button @click="addPatientForm = true" id="btn-add-patient">Añadir paciente</button>
+                <button @click="addPatientForm = true" id="btn-add-patient">&#43; Añadir paciente</button>
                 <p>Seleccionar paciente</p>
                 <select name="patients" id="select-patient" v-model="selectedIdx">
                     <option :value="index" v-for="(it, index) in dbPatients" :key="index">
@@ -125,7 +170,12 @@ const handleLogout = async () => {
                         <li>DNI: {{ personToShow.patient.dni }}</li>
                         <li>Obra Social: {{ personToShow.patient.health_insurance }}</li>
                     </ul>
-                    <p>Turnos:</p>
+                    <button @click="handleModifPatientForm(personToShow.patient)" class="btn-patient-mod">Editar
+                        información</button>
+                    <button @click="handleDeletePatient(personToShow.patient.id)" class="btn-patient-mod"
+                        id="btn-del-patient" v-if="!personToShow.patient.main">Borrar
+                        paciente</button>
+                    <p v-if="patientAppts">Turnos:</p>
                     <div v-if="patientAppts" v-for="it in patientAppts" class="appt-card">
                         <span>{{ new Date(it.appt_date).toLocaleString('es-ar', {
                             timeZone: 'UTC', dateStyle: "short",
@@ -166,8 +216,37 @@ const handleLogout = async () => {
             </form>
             <button @click="addPatientForm = false" id="btn-cancel">Cancelar</button>
         </div>
-        <button @click="handleLogout" id="btn-logout">Cerrar sesión</button>
-
+        <button v-if="!modifPatientForm && !addPatientForm" @click="handleLogout" id="btn-logout">Cerrar sesión</button>
+        <div v-if="modifPatientForm" class="form-container">
+            <form @submit.prevent="submitModifPatientForm">
+                <div class="form-group">
+                    <label for="firstName">Nombre</label>
+                    <input type="text" id="firstName" v-model="formData.firstName" required />
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Apellido</label>
+                    <input type="text" id="lastName" v-model="formData.lastName" required />
+                </div>
+                <div class="form-group">
+                    <label for="phone">Número de teléfono</label>
+                    <div class="phone-input-container">
+                        <span class="phone-prefix">+54</span>
+                        <input type="tel" id="phone" v-model="formData.phone" required placeholder="3564101010"
+                            maxlength="15" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="dni">DNI</label>
+                    <input type="number" id="dni" v-model="formData.dni" required />
+                </div>
+                <div class="form-group">
+                    <label for="hin">Obra social</label>
+                    <input type="text" id="hin" v-model="formData.hin" required />
+                </div>
+                <button type="submit" :disabled="!isFormValid">Confirmar</button>
+            </form>
+            <button @click="modifPatientForm = false" id="btn-cancel">Cancelar</button>
+        </div>
     </div>
 </template>
 
@@ -195,7 +274,6 @@ const handleLogout = async () => {
     font-size: 1rem;
     cursor: pointer;
     transition: 0.25s;
-
     border: 4px solid transparent;
 
     &:hover {
@@ -204,7 +282,10 @@ const handleLogout = async () => {
 }
 
 #patients-section {
-    margin: 1em;
+    margin: 1em 0;
+    padding: 1em 2em;
+    border-radius: 0.5em;
+    border: 2px solid #c9c9c9;
 }
 
 #patient-data {
@@ -220,7 +301,7 @@ const handleLogout = async () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: fit-content;
+    width: 180px;
     padding: 0.5em;
     background-color: #fff;
     border: 2px solid gray;
@@ -267,7 +348,6 @@ button[type="submit"] {
     background-color: #3790D0;
     font-weight: 600;
     color: white;
-    border: none;
     border-radius: 0.5em;
     font-size: 1rem;
     cursor: pointer;
@@ -282,6 +362,35 @@ button[type="submit"] {
             border: 4px solid gray;
         }
     }
+
+    &:hover {
+        border: 4px solid #2176b3;
+    }
+}
+
+.btn-patient-mod {
+    cursor: pointer;
+    border-radius: 0.5em;
+    width: 200px;
+    height: auto;
+    padding: 0.5em;
+    border: 4px solid transparent;
+    background-color: #3790D0;
+    transition: 0.25s;
+    color: #EEEEEE;
+    margin-bottom: 1em;
+    font-weight: 600;
+    font-size: 1rem;
+
+    &:hover {
+        border: 4px solid #2176b3;
+    }
+}
+
+#btn-del-patient {
+    background-color: transparent;
+    border: 4px solid #3790D0;
+    color: #3790D0;
 
     &:hover {
         border: 4px solid #2176b3;

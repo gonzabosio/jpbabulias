@@ -63,3 +63,64 @@ func (h *Handler) AddPatientHandler(w http.ResponseWriter, r *http.Request) {
 		"patient_id": reqBody.ID,
 	}, http.StatusCreated)
 }
+
+func (h *Handler) EditPatientDataHandler(w http.ResponseWriter, r *http.Request) {
+	reqBody := new(model.UpdatePatient)
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		WriteJSON(w, map[string]string{
+			"message":    "Patient data decodification error",
+			"error_dets": err.Error(),
+		}, http.StatusBadRequest)
+		return
+	}
+	// if err := validate.Struct(&reqBody); err != nil {
+	// 	errors := err.(validator.ValidationErrors)
+	// 	WriteJSON(w, map[string]string{
+	// 		"message":    "Patient data validation error",
+	// 		"error_dets": errors.Error(),
+	// 	}, http.StatusBadRequest)
+	// 	return
+	// }
+	err := h.rp.EditPatientData(reqBody)
+	if err != nil {
+		WriteJSON(w, map[string]string{
+			"message":    "Failed to edit patient data",
+			"error_dets": err.Error(),
+		}, http.StatusInternalServerError)
+		return
+	}
+
+	WriteJSON(w, map[string]string{
+		"message": "Patient data updated",
+	}, http.StatusOK)
+}
+
+func (h *Handler) DeletePatientByIdHandler(w http.ResponseWriter, r *http.Request) {
+	patientIdStr := chi.URLParam(r, "patient_id")
+	patientId, err := strconv.Atoi(patientIdStr)
+	if err != nil {
+		WriteJSON(w, map[string]string{
+			"message":    "Failed to delete patient",
+			"error_dets": err.Error(),
+		}, http.StatusBadRequest)
+		return
+	}
+	err = h.rp.DeletePatientById(patientId)
+	if err != nil {
+		if err.Error() == "patient have existing appointments" {
+			WriteJSON(w, map[string]string{
+				"message":    "Failed to delete patient",
+				"error_dets": err.Error(),
+			}, http.StatusConflict)
+			return
+		}
+		WriteJSON(w, map[string]string{
+			"message":    "Failed to delete patient",
+			"error_dets": err.Error(),
+		}, http.StatusInternalServerError)
+		return
+	}
+	WriteJSON(w, map[string]string{
+		"message": "Patient deleted",
+	}, http.StatusOK)
+}

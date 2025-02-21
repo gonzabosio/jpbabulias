@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gonzabosio/jpbabulias/db/model"
@@ -10,6 +11,8 @@ import (
 type PatientRepository interface {
 	ReadPatientsByUserId(userId int) (*[]model.PatientAppts, error)
 	SavePatient(patient *model.InsertPatient) error
+	EditPatientData(patient *model.UpdatePatient) error
+	DeletePatientById(patientId int) error
 }
 
 var _ PatientRepository = (*PostgreService)(nil)
@@ -82,5 +85,35 @@ func (p *PostgreService) SavePatient(patient *model.InsertPatient) error {
 	}
 	patientIdStr := strconv.Itoa(patientId)
 	patient.ID = patientIdStr
+	return nil
+}
+
+func (p *PostgreService) EditPatientData(patient *model.UpdatePatient) error {
+	patientId, err := strconv.Atoi(patient.ID)
+	if err != nil {
+		return err
+	}
+	_, err = p.DB.Exec(`UPDATE patient SET first_name=$1, last_name=$2, phone_number=$3, dni=$4, health_insurance=$5 WHERE id=$6`,
+		patient.FirstName, patient.LastName, patient.PhoneNumber, patient.Dni, patient.HealthInsurance, patientId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PostgreService) DeletePatientById(patientId int) error {
+	result, err := p.DB.Exec(`DELETE FROM patient WHERE id = $1 
+		AND NOT EXISTS (SELECT 1 FROM appointment WHERE patient_id = $1)`,
+		patientId)
+	if err != nil {
+		return err
+	}
+	rowsAff, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAff == 0 {
+		return fmt.Errorf("patient have existing appointments")
+	}
 	return nil
 }

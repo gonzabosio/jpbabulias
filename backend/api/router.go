@@ -23,7 +23,7 @@ func NewRouter() (*chi.Mux, error) {
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{os.Getenv("FRONTEND_URL")},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"},
 		AllowCredentials: true,
 	}))
 	r.Use(middleware.Logger)
@@ -51,6 +51,8 @@ func NewRouter() (*chi.Mux, error) {
 		r.Route("/patient", func(r chi.Router) {
 			r.Get("/{user_id}", h.GetPatientsByUserIdHandler)
 			r.Post("/", h.AddPatientHandler)
+			r.Patch("/", h.EditPatientDataHandler)
+			r.Delete("/{patient_id}", h.DeletePatientByIdHandler)
 		})
 	})
 
