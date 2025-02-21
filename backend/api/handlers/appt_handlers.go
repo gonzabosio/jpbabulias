@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gonzabosio/jpbabulias/async"
 	"github.com/gonzabosio/jpbabulias/db/model"
 
 	"github.com/go-chi/chi/v5"
@@ -39,6 +40,8 @@ func (h *Handler) AddAppointmentHandler(w http.ResponseWriter, r *http.Request) 
 		"message": "Appointment saved",
 		"appt_id": reqbody.ID,
 	}, http.StatusCreated)
+
+	async.SendApptEmail(reqbody)
 }
 
 func (h *Handler) GetAppointmentsByUserIdHandler(w http.ResponseWriter, r *http.Request) {

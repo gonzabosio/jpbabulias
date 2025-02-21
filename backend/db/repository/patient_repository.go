@@ -24,12 +24,18 @@ func (p *PostgreService) ReadPatientsByUserId(userId int) (*[]model.PatientAppts
 	patientsDataMap := make(map[int]model.Patient)
 	patientsIdList := []int{}
 	for rows.Next() {
-		var patient model.Patient
-		if err := rows.Scan(&patient.ID, &patient.FirstName, &patient.LastName, &patient.PhoneNumber, &patient.Dni, &patient.HealthInsurance, &patient.Main, &patient.UserID); err != nil {
+		var (
+			patient       model.Patient
+			patientID     int
+			patientUserID int
+		)
+		if err := rows.Scan(&patientID, &patient.FirstName, &patient.LastName, &patient.PhoneNumber, &patient.Dni, &patient.HealthInsurance, &patient.Main, &patientUserID); err != nil {
 			return nil, err
 		}
-		patientsIdList = append(patientsIdList, patient.ID)
-		patientsDataMap[patient.ID] = patient
+		patientsIdList = append(patientsIdList, patientID)
+		patient.ID = strconv.Itoa(patientID)
+		patient.UserID = strconv.Itoa(patientUserID)
+		patientsDataMap[patientID] = patient
 	}
 
 	apptRows, err := p.DB.Query(`SELECT *
@@ -41,15 +47,20 @@ func (p *PostgreService) ReadPatientsByUserId(userId int) (*[]model.PatientAppts
 		return nil, err
 	}
 	defer apptRows.Close()
-	appointmentsMap := make(map[int][]model.Appointment)
+	appointmentsMap := make(map[int][]model.ExportAppointment)
 	for apptRows.Next() {
-		var appt model.Appointment
-		if err := apptRows.Scan(&appt.ID, &appt.ApptDate, &appt.Subject, &appt.PatientID); err != nil {
+		var (
+			appt          model.ExportAppointment
+			apptID        int
+			apptPatientID int
+		)
+		if err := apptRows.Scan(&apptID, &appt.ApptDate, &appt.Subject, &apptPatientID); err != nil {
 			return nil, err
 		}
-		appointmentsMap[appt.PatientID] = append(appointmentsMap[appt.PatientID], appt)
+		appt.ID = strconv.Itoa(apptID)
+		appt.PatientID = strconv.Itoa(apptPatientID)
+		appointmentsMap[apptPatientID] = append(appointmentsMap[apptPatientID], appt)
 	}
-	// fmt.Printf("Patient Id List: %v\nPatient Data Map: %v\nAppointments Map: %v\n", patientsIdList, patientsDataMap, appointmentsMap)
 	patientsApptList := []model.PatientAppts{}
 	for _, id := range patientsIdList {
 		patientsApptList = append(patientsApptList, model.PatientAppts{

@@ -1,6 +1,6 @@
 import { backurl } from "../main"
 import { checkCookie } from "../router"
-import { deleteCookie, logout } from "./user"
+import { logout } from "./user"
 
 export const getDayAppointments = async (date, retry = true) => {
     try {
@@ -58,7 +58,8 @@ export const getFullyBookedDates = async (retry = true) => {
     }
 }
 
-export const saveAppointment = async (apptDate, subject, patientId, retry = true) => {
+export const saveAppointment = async (apptDate, subject, patientId, email, retry = true) => {
+    console.log(apptDate, subject, patientId, email)
     try {
         const resp = await fetch(backurl + '/appointment', {
             method: 'POST',
@@ -67,7 +68,8 @@ export const saveAppointment = async (apptDate, subject, patientId, retry = true
             body: JSON.stringify({
                 appt_date: apptDate,
                 subject: subject,
-                patient_id: patientId
+                patient_id: patientId,
+                email: email
             })
         })
         const payload = await resp.json()

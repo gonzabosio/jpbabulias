@@ -8,6 +8,7 @@ export const getPatientsDataByUserId = async (userId, retry = true) => {
             credentials: 'include'
         })
         const payload = await resp.json()
+        console.log(payload)
         if (!resp.ok) {
             if (resp.status === 401) {
                 if (retry && checkCookie('access_token')) {

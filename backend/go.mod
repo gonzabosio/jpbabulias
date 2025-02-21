@@ -9,6 +9,7 @@ require (
 	github.com/go-chi/jwtauth/v5 v5.3.2
 	github.com/go-playground/validator/v10 v10.24.0
 	github.com/joho/godotenv v1.5.1
+	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/lib/pq v1.10.9
 	github.com/tmc/langchaingo v0.1.13
 	golang.org/x/crypto v0.32.0

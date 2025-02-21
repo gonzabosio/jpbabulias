@@ -7,17 +7,17 @@ import { useRouter } from 'vue-router';
 
 const toast = useToast()
 const router = useRouter()
-const localStoredUserDate = JSON.parse(localStorage.getItem("user") || {})
+const localStoredUserData = JSON.parse(localStorage.getItem("user") || {})
 
-const patients = ref([])
+const patientsList = ref([])
 const patientSelected = ref({})
 const indexSelected = ref(0)
 onBeforeMount(async () => {
     window.scrollTo(0, 0)
     setTimeout(async () => {
-        if (!patients.value.length) {
-            // show loading spinner component while getting patient data
-            const response = await getPatientsDataByUserId(localStoredUserDate.user_id)
+        if (!patientsList.value.length) {
+            const response = await getPatientsDataByUserId(localStoredUserData.user_id)
+            console.log(response)
             if (response.error) {
                 if (response.code === 401) {
                     toast.info(response.message)
@@ -30,19 +30,18 @@ onBeforeMount(async () => {
                 console.error(response.message)
                 toast.error('Error al intentar cargar datos del paciente')
             } else {
-                patients.value = response.patients
-                patientSelected.value = patients.value.find(opt => opt.main)
-                if (!patientSelected.value) {
+                patientsList.value = response.patients
+                patientSelected.value = patientsList.value.find(opt => opt.patient.main)
+                if (!patientsList.value) {
                     toast.error('Error al intentar cargar datos del paciente')
                 }
             }
         }
-
     }, 500)
 })
 
 watch(indexSelected, async (newIdx) => {
-    patientSelected.value = patients.value[newIdx]
+    patientSelected.value = patientsList.value[newIdx]
 })
 
 const f = new Intl.DateTimeFormat('es-ar', {
@@ -55,7 +54,7 @@ const dateToConfirm = f.format(selectedDate)
 
 const formData = reactive({
     subject: "",
-    email: localStoredUserDate.email,
+    email: localStoredUserData.email,
     phone: "",
     dni: "",
     hin: ""
@@ -63,9 +62,9 @@ const formData = reactive({
 
 watch(patientSelected, (loadedPatient) => {
     if (loadedPatient) {
-        formData.phone = loadedPatient.phone_number
-        formData.dni = loadedPatient.dni
-        formData.hin = loadedPatient.health_insurance
+        formData.phone = loadedPatient.patient.phone_number
+        formData.dni = loadedPatient.patient.dni
+        formData.hin = loadedPatient.patient.health_insurance
     }
 })
 
@@ -92,7 +91,7 @@ const submitForm = async () => {
     console.log(formattedDate);
     if (isFormValid.value) {
         console.log('Form submitted:', formData)
-        const result = await saveAppointment(formattedDate, formData.subject, patientSelected.value.id)
+        const result = await saveAppointment(formattedDate, formData.subject, patientSelected.value.patient.id, localStoredUserData.email)
         if (result.error) {
             if (result.code === 401) {
                 toast.info(result.message)
@@ -118,9 +117,9 @@ const submitForm = async () => {
         <h2>Confirma tu turno</h2>
         <p>{{ String(dateToConfirm).charAt(0).toUpperCase() + String(dateToConfirm).slice(1) }}</p>
         <div id="patient-select-container">
-            <select v-if="patients" name="patient" id="patient-selection" v-model="indexSelected">
-                <option v-for="(patient, index) in patients" :key="index" :value="index">
-                    {{ patient.first_name + ' ' + patient.last_name }}
+            <select v-if="patientsList" name="patient" id="patient-selection" v-model="indexSelected">
+                <option v-for="(data, index) in patientsList" :key="index" :value="index">
+                    {{ data.patient.first_name + ' ' + data.patient.last_name }}
                 </option>
             </select>
             <button @click="router.push('/perfil')" id="btn-add-patient">Añadir</button>
@@ -265,6 +264,7 @@ button[type="submit"]:disabled {
     color: #EEEEEE;
     border: 4px solid transparent;
     border-radius: 0.5em;
+    cursor: pointer;
 
     &:hover {
         border: 4px solid #2176b3;

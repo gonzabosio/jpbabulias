@@ -29,6 +29,13 @@ func (p *PostgreService) SaveAppointment(appt *model.InsertAppointment) error {
 		return err
 	}
 	appt.ID = strconv.Itoa(apptID)
+	firstName := ""
+	lastName := ""
+	err = p.DB.QueryRow(`SELECT first_name, last_name FROM patient WHERE id=$1`, appt.PatientID).Scan(&firstName, &lastName)
+	if err != nil {
+		return err
+	}
+	appt.FullName = firstName + " " + lastName
 	return nil
 }
 
