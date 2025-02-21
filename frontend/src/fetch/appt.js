@@ -60,7 +60,7 @@ export const getFullyBookedDates = async () => {
 }
 
 export const saveAppointment = async (apptDate, subject, patientId, email) => {
-    console.log(apptDate, subject, patientId, email)
+    // console.log(apptDate, subject, patientId, email)
     try {
         const resp = await fetch(backurl + '/appointment', {
             method: 'POST',

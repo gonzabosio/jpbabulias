@@ -4,7 +4,9 @@ import { getPatientsDataByUserId } from '../fetch/patient'
 import { useToast } from "vue-toastification";
 import { saveAppointment } from '../fetch/appt';
 import { useRouter } from 'vue-router';
+import LoadingSpinner from '../components/LoadingSpinner.vue';
 
+const showLoadingSpinner = ref(false)
 const toast = useToast()
 const router = useRouter()
 const localStoredUserData = JSON.parse(localStorage.getItem("user") || {})
@@ -79,6 +81,7 @@ const isFormValid = computed(() => {
 })
 
 const submitForm = async () => {
+    showLoadingSpinner.value = true
     const year = selectedDate.getUTCFullYear();
     const month = String(selectedDate.getUTCMonth() + 1).padStart(2, '0');
     const day = String(selectedDate.getUTCDate()).padStart(2, '0');
@@ -102,7 +105,9 @@ const submitForm = async () => {
                 return
             }
             console.error(result.message)
+            showLoadingSpinner.value = false
             toast.error('No se pudo agendar el turno. Intente nuevamente')
+
         } else {
             toast.success('Turno agendado')
             router.replace('/perfil')
@@ -113,7 +118,7 @@ const submitForm = async () => {
 </script>
 
 <template>
-    <div class="form-container">
+    <div class="form-container" v-if="!showLoadingSpinner">
         <h2>Confirma tu turno</h2>
         <p>{{ String(dateToConfirm).charAt(0).toUpperCase() + String(dateToConfirm).slice(1) }}</p>
         <div id="patient-select-container">
@@ -147,6 +152,9 @@ const submitForm = async () => {
             </div>
             <button type="submit" :disabled="!isFormValid">Confirmar</button>
         </form>
+    </div>
+    <div v-else class="loading-spinner-overlay">
+        <LoadingSpinner />
     </div>
 </template>
 

@@ -4,7 +4,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { userLogin, userSignUp } from '../fetch/user'
 import { useToast } from "vue-toastification";
 import { getLastAttemptedRoute } from '../router';
+import LoadingSpinner from '../components/LoadingSpinner.vue'
 
+const showLoadingSpinner = ref(false)
 const toast = useToast()
 const route = useRoute()
 const router = useRouter()
@@ -20,14 +22,29 @@ const formData = {
     insurance: ''
 }
 
-watch(formMode, () => {
+watch(formMode, (newMode) => {
+    if (newMode === 'login') {
+        formData.firstName = ''
+        formData.lastName = ''
+        formData.email = ''
+        formData.password = ''
+        formData.birthDate = ''
+        formData.phoneNumber = ''
+        formData.dni = ''
+        formData.insurance = ''
+    } else {
+        formData.email = ''
+        formData.password = ''
+    }
     router.replace({ query: { mode: formMode.value } })
 })
 
 const handleLogin = async () => {
+    showLoadingSpinner.value = true
     const resp = await userLogin(formData.email, formData.password)
     if (resp.error) {
         toast.error(resp.message)
+        showLoadingSpinner.value = false
     } else {
         const userData = {
             user_id: resp.user_data.id,
@@ -38,14 +55,17 @@ const handleLogin = async () => {
         const redirect = getLastAttemptedRoute() || '/'
         router.replace(redirect)
     }
+
 }
 
 const handleSignUp = async () => {
+    showLoadingSpinner.value = true
     const date = new Date(formData.birthDate)
     formData.birthDate = date.toISOString()
     const resp = await userSignUp(formData)
     if (resp.error) {
         toast.error('Falló el registro. Revise los campos e inténtelo de nuevo')
+        showLoadingSpinner.value = false
     } else {
         const userData = {
             user_id: resp.user_data.id,
@@ -61,27 +81,29 @@ const handleSignUp = async () => {
 </script>
 
 <template>
-    <div v-if="formMode === 'login'" class="container">
+    <div v-if="formMode === 'login' && !showLoadingSpinner" class="container">
         <div class="form-container">
-            <h1>Iniciar sesión</h1>
-            <form @submit.prevent="handleLogin">
-                <div class="form-group">
-                    <label for="email">Correo electrónico</label>
-                    <input type="email" id="email" v-model="formData.email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Contraseña</label>
-                    <input type="password" id="password" v-model="formData.password" required>
-                </div>
-                <a href="/recuperar" id="recover-pw-link">Olvidé mi contraseña</a>
-                <button type="submit" class="submit-btn">
-                    Iniciar sesión
-                </button>
-            </form>
-            <button @click="formMode = 'signup'" class="btn-switch-form">Crear cuenta</button>
+            <div>
+                <h1>Iniciar sesión</h1>
+                <form @submit.prevent="handleLogin">
+                    <div class="form-group">
+                        <label for="email">Correo electrónico</label>
+                        <input type="email" id="email" v-model="formData.email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" v-model="formData.password" required>
+                    </div>
+                    <a href="/recuperar" id="recover-pw-link">Olvidé mi contraseña</a>
+                    <button type="submit" class="submit-btn">
+                        Iniciar sesión
+                    </button>
+                </form>
+                <button @click="formMode = 'signup'" class="btn-switch-form">Crear cuenta</button>
+            </div>
         </div>
     </div>
-    <div v-else class="container">
+    <div v-else-if="!showLoadingSpinner" class="container">
         <div class="form-container">
             <h1>Registrarse</h1>
             <form @submit.prevent="handleSignUp">
@@ -127,6 +149,9 @@ const handleSignUp = async () => {
             </form>
             <button @click="formMode = 'login'" class="btn-switch-form">Tengo una cuenta</button>
         </div>
+    </div>
+    <div v-else class="loading-spinner-overlay">
+        <LoadingSpinner />
     </div>
 </template>
 
