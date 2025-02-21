@@ -84,3 +84,30 @@ export const logout = async (retry = true) => {
 export const deleteCookie = (name) => {
     document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + domain
 }
+
+export const CookiesExist = async (retry = true) => {
+    try {
+        const resp = await fetch(backurl + '/tokens', {
+            method: 'HEAD',
+            credentials: 'include'
+        })
+        if (!resp.ok) {
+            if (resp.status === 401) {
+                if (retry) {
+                    return await CookiesExist(false)
+                } else {
+                    const logoutResp = await logout()
+                    if (logoutResp.error) {
+                        return false
+                    }
+                    return false
+                }
+            }
+            return false
+        }
+        return true
+    } catch (error) {
+        console.log(error.message)
+        return false
+    }
+}

@@ -93,8 +93,8 @@ const submitForm = async () => {
 const handleLogout = async () => {
     const result = await logout()
     if (result.error) {
-        deleteCookie('access_token')
-        deleteCookie('refresh_token')
+        // deleteCookie('access_token')
+        // deleteCookie('refresh_token')
         router.replace('/')
         return
     }

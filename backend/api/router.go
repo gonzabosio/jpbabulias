@@ -54,6 +54,9 @@ func NewRouter() (*chi.Mux, error) {
 			r.Patch("/", h.EditPatientDataHandler)
 			r.Delete("/{patient_id}", h.DeletePatientByIdHandler)
 		})
+		r.Head("/tokens", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		})
 	})
 
 	r.Route("/bot", func(r chi.Router) {

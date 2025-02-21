@@ -1,8 +1,7 @@
 import { backurl } from "../main"
-import { checkCookie } from "../router"
-import { logout } from "./user"
+import { CookiesExist, logout } from "./user"
 
-export const getDayAppointments = async (date, retry = true) => {
+export const getDayAppointments = async (date) => {
     try {
         const resp = await fetch(backurl + '/appointment/day?date=' + date, {
             credentials: 'include'
@@ -10,7 +9,8 @@ export const getDayAppointments = async (date, retry = true) => {
         const payload = await resp.json()
         if (!resp.ok) {
             if (resp.status === 401) {
-                if (retry && checkCookie('access_token')) {
+                const tokensExist = await CookiesExist()
+                if (tokensExist) {
                     return await getDayAppointments(date, false)
                 } else {
                     const logoutResp = await logout()
@@ -30,7 +30,7 @@ export const getDayAppointments = async (date, retry = true) => {
     }
 }
 
-export const getFullyBookedDates = async (retry = true) => {
+export const getFullyBookedDates = async () => {
     try {
         const resp = await fetch(backurl + '/appointment/full', {
             credentials: 'include'
@@ -38,7 +38,8 @@ export const getFullyBookedDates = async (retry = true) => {
         const payload = await resp.json()
         if (!resp.ok) {
             if (resp.status === 401) {
-                if (retry && checkCookie('access_token')) {
+                const tokensExist = await CookiesExist()
+                if (tokensExist) {
                     return await getFullyBookedDates(false)
                 } else {
                     const logoutResp = await logout()
@@ -58,7 +59,7 @@ export const getFullyBookedDates = async (retry = true) => {
     }
 }
 
-export const saveAppointment = async (apptDate, subject, patientId, email, retry = true) => {
+export const saveAppointment = async (apptDate, subject, patientId, email) => {
     console.log(apptDate, subject, patientId, email)
     try {
         const resp = await fetch(backurl + '/appointment', {
@@ -75,7 +76,8 @@ export const saveAppointment = async (apptDate, subject, patientId, email, retry
         const payload = await resp.json()
         if (!resp.ok) {
             if (resp.status === 401) {
-                if (retry && checkCookie('access_token')) {
+                const tokensExist = await CookiesExist()
+                if (tokensExist) {
                     return await saveAppointment(apptDate, subject, patientId, retry, false)
                 } else {
                     const logoutResp = await logout()

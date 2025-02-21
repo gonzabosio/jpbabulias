@@ -1,8 +1,7 @@
 import { backurl } from "../main"
-import { checkCookie } from "../router"
 import { logout } from "./user"
 
-export const getPatientsDataByUserId = async (userId, retry = true) => {
+export const getPatientsDataByUserId = async (userId) => {
     try {
         const resp = await fetch(backurl + '/patient/' + userId, {
             credentials: 'include'
@@ -11,7 +10,8 @@ export const getPatientsDataByUserId = async (userId, retry = true) => {
         // console.log(payload)
         if (!resp.ok) {
             if (resp.status === 401) {
-                if (retry && checkCookie('access_token')) {
+                const tokensExist = await CookiesExist()
+                if (tokensExist) {
                     return await getPatientsDataByUserId(userId, false)
                 } else {
                     const logoutResp = await logout()
@@ -31,7 +31,7 @@ export const getPatientsDataByUserId = async (userId, retry = true) => {
     }
 }
 
-export const savePatient = async (formData, userId, retry = true) => {
+export const savePatient = async (formData, userId) => {
     // console.log(formData, userId)
     try {
         const resp = await fetch(backurl + '/patient', {
@@ -50,7 +50,8 @@ export const savePatient = async (formData, userId, retry = true) => {
         const payload = await resp.json()
         if (!resp.ok) {
             if (resp.status === 401) {
-                if (retry && checkCookie('access_token')) {
+                const tokensExist = await CookiesExist()
+                if (tokensExist) {
                     return await savePatient(formData, userId, false)
                 } else {
                     const logoutResp = await logout()
@@ -70,7 +71,7 @@ export const savePatient = async (formData, userId, retry = true) => {
     }
 }
 
-export const editPatientData = async (formData, patientId, retry = true) => {
+export const editPatientData = async (formData, patientId) => {
     // console.log('data:', formData, patientId)
     try {
         const resp = await fetch(backurl + '/patient', {
@@ -89,7 +90,8 @@ export const editPatientData = async (formData, patientId, retry = true) => {
         const payload = await resp.json()
         if (!resp.ok) {
             if (resp.status === 401) {
-                if (retry && checkCookie('access_token')) {
+                const tokensExist = await CookiesExist()
+                if (tokensExist) {
                     return await editPatientData(formData, patientId, false)
                 } else {
                     const logoutResp = await logout()
@@ -109,7 +111,7 @@ export const editPatientData = async (formData, patientId, retry = true) => {
     }
 }
 
-export const deletePatientById = async (patientId, retry = true) => {
+export const deletePatientById = async (patientId) => {
     try {
         const resp = await fetch(backurl + '/patient/' + patientId, {
             method: 'DELETE',
@@ -118,7 +120,8 @@ export const deletePatientById = async (patientId, retry = true) => {
         const payload = await resp.json()
         if (!resp.ok) {
             if (resp.status === 401) {
-                if (retry && checkCookie('access_token')) {
+                const tokensExist = await CookiesExist()
+                if (tokensExist) {
                     return await deletePatientById(patientId, false)
                 } else {
                     const logoutResp = await logout()

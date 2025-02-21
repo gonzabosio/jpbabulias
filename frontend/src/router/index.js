@@ -6,7 +6,7 @@ import Profile from '../views/Profile.vue'
 import Treatments from '../views/Treatments.vue'
 import ApptConfirmation from '../views/ApptConfirmation.vue'
 import Register from '../views/Register.vue'
-import { deleteCookie } from '../fetch/user'
+import { CookiesExist } from '../fetch/user'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -61,26 +61,25 @@ const router = createRouter({
 
 
 let lastAttemptedRoute = null
-router.beforeEach((to, from, next) => {
-    const tokenExists = checkCookie("refresh_token")
-
-    if (to.meta.requiresAuth && !tokenExists) {
-        // deleteCookie('access_token')
+router.beforeEach(async (to, from, next) => {
+    if (to.meta.requiresAuth) {
+        const cookiesExist = await CookiesExist()
         lastAttemptedRoute = to.fullPath
-        next({
-            path: "/registro",
-            query: { mode: 'login' }
-        }) // redirect unauthorized users
+        if (!cookiesExist) {
+            next({
+                path: "/registro",
+                query: { mode: 'login' }
+
+            }) // redirect unauthorized users
+        } else {
+            next() // allow navigation
+        }
     } else {
-        next() // allow navigation
+        next()
     }
 })
 
 export default router
-
-export function checkCookie(name) {
-    return document.cookie.split("; ").some(row => row.startsWith(name + "="))
-}
 
 export function getLastAttemptedRoute() {
     return lastAttemptedRoute
