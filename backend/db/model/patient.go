@@ -32,6 +32,6 @@ type UpdatePatient struct {
 	FirstName       string `json:"first_name" validate:"required"`
 	LastName        string `json:"last_name" validate:"required"`
 	PhoneNumber     string `json:"phone_number" validate:"required"`
-	Dni             string `json:"dni" validate:"required"`
+	Dni             int    `json:"dni" validate:"required"`
 	HealthInsurance string `json:"health_insurance" validate:"required"`
 }
