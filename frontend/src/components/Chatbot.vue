@@ -77,8 +77,7 @@ onMounted(() => {
                 <div class="globe"></div>
             </div>
             <div class="chat-input">
-                <input v-model="userInput" @keyup.enter="sendMessage" placeholder="¿Qué horarios tiene el doctor?"
-                    :disabled="isProcessing" />
+                <input v-model="userInput" @keyup.enter="sendMessage" placeholder="Horarios" :disabled="isProcessing" />
                 <button @click="sendMessage" :disabled="isProcessing">Enviar</button>
             </div>
         </div>
@@ -140,6 +139,16 @@ onMounted(() => {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
+    /* Add max-height and handle smaller screens */
+    max-height: calc(100vh - 100px);
+
+    /* Add media query for mobile */
+    @media screen and (max-width: 768px) {
+        width: calc(100vw - 40px);
+        /* Account for container padding */
+        right: 0;
+        height: 60vh;
+    }
 }
 
 .chat-header {
@@ -183,27 +192,39 @@ onMounted(() => {
     display: flex;
     padding: 10px;
     border-top: 1px solid #ccc;
+    /* Add gap between input and button */
+    gap: 8px;
+    /* Ensure it stays at the bottom */
+    position: relative;
+    background: white;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 .chat-input input {
-    flex-grow: 1;
-    padding: 5px;
+    flex: 1;
+    min-width: 0;
+    /* Prevent input from overflowing */
+    padding: 8px 12px;
     border: 1px solid #ccc;
-    border-radius: 3px;
+    border-radius: 0.5em;
     font-family: poppins-regular;
 }
 
 .chat-input button {
-    margin-left: 5px;
-    padding: 5px 10px;
+    /* Remove margin-left since we're using gap */
+    padding: 8px 16px;
     background-color: #3790D0;
     font-family: poppins-regular;
     font-weight: 600;
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 0.5em;
     cursor: pointer;
     transition: 0.25s;
+    /* Ensure button doesn't shrink */
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .chat-input button:hover {

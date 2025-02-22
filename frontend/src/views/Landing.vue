@@ -29,7 +29,7 @@ const descriptionList = [
 </template>
 <style scoped>
 #leading-container {
-    padding-top: 7em;
+    padding: 7em 1em;
     display: flex;
     flex-direction: column;
     align-items: center;

@@ -24,9 +24,9 @@ const mediaOrtodoncia = [
 ]
 const medias = ref([
     {
-        name: 'Rehabilitacion en zirconio',
+        name: 'Ortodoncia',
         currentIndex: 0,
-        content: mediaZirconio,
+        content: mediaOrtodoncia
     },
     {
         name: 'Carillas',
@@ -34,10 +34,10 @@ const medias = ref([
         content: mediaCarillas
     },
     {
-        name: 'Ortodoncia',
+        name: 'Rehabilitación en zirconio',
         currentIndex: 0,
-        content: mediaOrtodoncia
-    }
+        content: mediaZirconio,
+    },
 ])
 
 
