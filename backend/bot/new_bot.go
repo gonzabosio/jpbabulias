@@ -13,7 +13,11 @@ import (
 func NewLLM() error {
 	ctx := context.Background()
 	api_key := os.Getenv("GEMINI_API_KEY")
-	llm, err := googleai.New(ctx, googleai.WithAPIKey(api_key))
+	llm, err := googleai.New(ctx,
+		googleai.WithAPIKey(api_key),
+		googleai.WithDefaultModel("gemini-2.0-flash"),
+		googleai.WithDefaultTemperature(0.5),
+	)
 	if err != nil {
 		return fmt.Errorf("Failed to run gemini model: %v", err)
 	}
@@ -25,7 +29,7 @@ func NewLLM() error {
 		},
 		{
 			PageContent: `Respond in Spanish only, and do not use any English words in your answers. Do not mention that you are consulting documents or providing information from documents. 
-			If you receive a greeting, say hello too, be kind and offer help, don't give specific information.`,
+			Be kind. Do not greet if you are not greeted first.`,
 			Metadata: map[string]interface{}{"topic": "response considerations"},
 		},
 		{
@@ -50,6 +54,10 @@ func NewLLM() error {
 			- Instagram: od.jpbabulias
 			- Whatsapp: +54-3564-590331`,
 			Metadata: map[string]interface{}{"topic": "doctor's social media"},
+		},
+		{
+			PageContent: `When user is logged in, he will have a profile section where he can visualize his appointments and the ones of his saved patients whose data
+			can be modified or deleted, but also add new patients to the account. Also they can close the user session, only say it if the ask for it specifically.`,
 		},
 	}
 
