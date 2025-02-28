@@ -27,6 +27,7 @@ const loadUserAndPatients = async () => {
             return
         }
         toast.error('No se cargaron tus datos correctamente. Recargue la página')
+        return
     }
     dbPatients.value = result.patients
     personToShow.value = dbPatients.value.find(it => it.patient.main)
@@ -131,10 +132,11 @@ const submitModifPatientForm = async () => {
         }
         showLoadingSpinner.value = false
         toast.error('No se pudo actualizar los datos del paciente')
+    } else {
+        modifPatientForm.value = false
+        showLoadingSpinner.value = false
+        toast.success('Datos del paciente actualizados')
     }
-    modifPatientForm.value = false
-    showLoadingSpinner.value = false
-    toast.success('Datos del paciente actualizados')
 }
 
 const handleDeletePatient = async (patientId) => {
@@ -154,12 +156,13 @@ const handleDeletePatient = async (patientId) => {
             showLoadingSpinner.value = false
             toast.error('No se pudo eliminar el paciente. Intente de nuevo')
         }
+    } else {
+        dbPatients.value = [...dbPatients.value.filter(patient => patient.patient.id !== patientId)]
+        // console.log(selectedIdx.value, mainPatientIdx.value)
+        selectedIdx.value = mainPatientIdx.value
+        showLoadingSpinner.value = false
+        toast.success('Paciente eliminado')
     }
-    dbPatients.value = [...dbPatients.value.filter(patient => patient.patient.id !== patientId)]
-    console.log(selectedIdx.value, mainPatientIdx.value)
-    selectedIdx.value = mainPatientIdx.value
-    showLoadingSpinner.value = false
-    toast.success('Paciente eliminado')
 }
 
 const handleAddPatientFormSwitch = async () => {

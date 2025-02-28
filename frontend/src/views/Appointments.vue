@@ -17,9 +17,9 @@ onBeforeMount(async () => {
                 path: '/registro',
                 query: { mode: 'login' }
             })
-            return
         }
         toast.error('No se cargaron las fechas sin turnos libres. Recargue la página')
+        return
     }
     // console.log(result.fully_booked_dates)
     fullDates.value = result.fully_booked_dates.map(date => new Date(date))

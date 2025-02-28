@@ -72,7 +72,6 @@ export const savePatient = async (formData, userId) => {
 }
 
 export const editPatientData = async (formData, patientId) => {
-    // console.log('data:', formData, patientId)
     try {
         const resp = await fetch(backurl + '/patient', {
             method: 'PATCH',
@@ -83,7 +82,7 @@ export const editPatientData = async (formData, patientId) => {
                 first_name: formData.firstName,
                 last_name: formData.lastName,
                 phone_number: '+54' + formData.phone,
-                dni: formData.dni,
+                dni: Number(formData.dni),
                 health_insurance: formData.hin,
             })
         })

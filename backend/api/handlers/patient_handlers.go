@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -73,14 +74,21 @@ func (h *Handler) EditPatientDataHandler(w http.ResponseWriter, r *http.Request)
 		}, http.StatusBadRequest)
 		return
 	}
-	// if err := validate.Struct(&reqBody); err != nil {
-	// 	errors := err.(validator.ValidationErrors)
-	// 	WriteJSON(w, map[string]string{
-	// 		"message":    "Patient data validation error",
-	// 		"error_dets": errors.Error(),
-	// 	}, http.StatusBadRequest)
-	// 	return
-	// }
+	if err := validate.Struct(reqBody); err != nil {
+		var ve validator.ValidationErrors
+		if errors.As(err, &ve) {
+			WriteJSON(w, map[string]string{
+				"message":    "Patient data validation error",
+				"error_dets": ve.Error(),
+			}, http.StatusBadRequest)
+			return
+		}
+		WriteJSON(w, map[string]string{
+			"message":    "Internal validation error",
+			"error_dets": err.Error(),
+		}, http.StatusInternalServerError)
+		return
+	}
 	err := h.rp.EditPatientData(reqBody)
 	if err != nil {
 		WriteJSON(w, map[string]string{
